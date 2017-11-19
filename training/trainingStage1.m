@@ -1,4 +1,4 @@
-function trainingStage1(masterDir, zSorted, times)
+function [b, Xtrain] = trainingStage1(masterDir, zSorted, times, type, dTrain)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -16,8 +16,8 @@ function trainingStage1(masterDir, zSorted, times)
 n = 2048;
 cropSize = 15;
 dataDir = fullfile(masterDir, 'MeanStack');
-type = "Amplitude";
-% type = ["Phase"];
+% type ='Amplitude';
+% type = 'Phase';
 
 % Define the range in z-steps to use in training (this is because using the
 % entire z-stack will be too RAM heavy)
@@ -29,18 +29,6 @@ zNF = (zHigh - zLow)/zStep + 1;
 % Find how many time sequences exist
 filePath = dir(fullfile(dataDir, char(type), sprintf('%0.2f', zLow)));
 tNF = length(filePath(not([filePath.isdir]))) - 2;  % number of time sequeces
-
-% Begin loading images into dTrain
-dTrain = zeros(n, n, zNF, tNF);
-% to avoid constantly changing working directories, dTrain will be
-% populated by z first (e.g. all times for z = zLow will be imported than z
-% = zLow+zStep, on and on)
-for i = 1: zNF
-    reconPath = fullfile(dataDir, char(type), sprintf('%0.2f', zSorted(i)));
-    for t = 1 : length(times)
-        dTrain(:, :, i, t) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(t))));
-    end
-end
 
 implay(permute(dTrain,[1 2 4 3]))
 

@@ -1,4 +1,4 @@
-function trainingStage2(dTrain, b, Xtrain)
+function [dTrainC] = trainingStage2(dTrain, b, Xtrain)
 
 pCutoff = 0.005;
 minCluster = 10;

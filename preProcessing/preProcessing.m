@@ -1,4 +1,4 @@
-function preProcessing(masterDir)
+function [times, zSorted] = preProcessing(masterDir)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -7,7 +7,6 @@ function preProcessing(masterDir)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-n = 2048;
 meanDir = fullfile(masterDir, 'MeanStack');
 mkdir(meanDir);
 
@@ -25,8 +24,6 @@ type = ["Amplitude", "Phase"];
 for i = 1 : length(type)
     zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(i))));
     NF = length(zSorted);
-    %filePath = dir(fullfile(masterDir, 'Stack', char(type(i))));
-    %NF = length(filePath([filePath.isdir])) - 2;  % number of z-steps
     for j = 1 : NF
         reconPath = fullfile(masterDir, 'Stack', char(type(i)), sprintf('%0.2f', zSorted(j)));
         timePath = dir(reconPath);
@@ -50,3 +47,5 @@ for i = 1 : length(type)
         end
     end
 end
+% Save metaData before ending function
+save(fullfile(meanDir, 'metaData.mat'), times, zSorted)
