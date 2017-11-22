@@ -3,7 +3,7 @@ function [b] = trainingStage3(dTrainC)
 % The parameters zVal and tVal represent the z-slice and timestep values
 % respectively of the image we would like to obtain more training pixels
 % from.
-zVal = 84;
+zVal = 5;
 tVal = 1;
 
 [newCoords] = getBugMoreBugCoords(dTrainC, zVal, 1, tVal);
@@ -42,5 +42,5 @@ if str == 'Y'
         b=new_b;
     end
 end
-filename = 'Where should the training data be saved? (e.g. C:\Users\manu\Desktop\TrainingData\Colwellia.mat';
+filename = input('Where should the training data be saved? (e.g. C:\Users\manu\Desktop\TrainingData\Colwellia.mat');
 save(filename, b, '-append')

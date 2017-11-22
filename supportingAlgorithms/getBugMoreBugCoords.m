@@ -15,12 +15,13 @@ imshow(DtrainC(:,:,z,t))
 cc=bwconncomp(DtrainC(:,:,z,t));
 pil = cc.PixelIdxList;
 point = dim2.*(uint32(x)-1)+uint32(y);
-index = 0;
-for i = 1:size(pil,2)
-    if size(find(pil{i}==point),1)>0
-        index = i;
-    end
-end
+%index = 0;
+% for i = 1:size(pil,2)
+%     if size(find(pil{i}==point),1)>0
+%         index = i;
+%     end
+% end
+[c, index] = min(abs(uint32(pil{3})-point));
 cluster = pil{index};
 newCoords = zeros(0,4);
 for j = 1:size(cluster,1)

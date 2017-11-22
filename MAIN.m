@@ -64,6 +64,7 @@ if train == 1
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
     [dTrain]    = import4D(masterDir, zSorted, times, zRange, tRange);
+    dTrain(:,:,:,2:end) = [];
     [b, Xtrain] = trainingStage1(dTrain);
     [dTrainC]   = trainingStage2(dTrain, b, Xtrain);
     [b]         = trainingStage3(dTrainC);

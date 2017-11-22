@@ -19,10 +19,10 @@ D_C = Dfit>pCutoff;
 
 % the code below removes connected components from D_C that are below
 % minCluster pixels
-%for j = 1:dim4
-    for z = 1:dim3
-        D_C3(:, :, j) = bwareaopen(D_C(:,:,:,j),minCluster,18);
+for j = 1:dim4
+    %for z = 1:dim3
+    D_C3(:,:,:,j) = bwareaopen(D_C(:,:,:,j),minCluster,18);
         %D_C3(:,:,z,j) = bwareaopen(D_C2(:,:,z,j),minCluster,4);
-    end
-%end
+    %end
+end
 end
