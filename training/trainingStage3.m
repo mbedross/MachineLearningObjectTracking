@@ -42,5 +42,5 @@ if str == 'Y'
         b=new_b;
     end
 end
-filename = fullfile(meanDir, 'metaData.mat');
+filename = 'Where should the training data be saved? (e.g. C:\Users\manu\Desktop\TrainingData\Colwellia.mat';
 save(filename, b, '-append')

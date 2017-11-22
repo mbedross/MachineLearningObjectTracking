@@ -1,4 +1,4 @@
-function [b, Xtrain] = trainingStage1(masterDir, zSorted, times, type, dTrain)
+function [b, Xtrain] = trainingStage1(dTrain)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -12,25 +12,8 @@ function [b, Xtrain] = trainingStage1(masterDir, zSorted, times, type, dTrain)
 
 % First import mean subtracted and filtered reconstructions into a four
 % dimensional matrix dTrain = XxYxZxt
-
-n = 2048;
+addpath('./supportingAlgorithms');
 cropSize = 15;
-dataDir = fullfile(masterDir, 'MeanStack');
-% type ='Amplitude';
-% type = 'Phase';
-
-% Define the range in z-steps to use in training (this is because using the
-% entire z-stack will be too RAM heavy)
-zLow = -16;
-zHigh = 16;
-zStep = 0.1;
-zNF = (zHigh - zLow)/zStep + 1;
-
-% Find how many time sequences exist
-filePath = dir(fullfile(dataDir, char(type), sprintf('%0.2f', zLow)));
-tNF = length(filePath(not([filePath.isdir]))) - 2;  % number of time sequeces
-
-implay(permute(dTrain,[1 2 4 3]))
 
 bugCoords = getBugCoords3(dTrain, 1, 1);
 
@@ -47,7 +30,7 @@ for z = 1 : size(dTrain,3)
         input_slice(:,:,1) = dTrain(:,:,z-1);
         input_slice(:,:,2) = dTrain(:,:,z-1);
     end
-    if z ~= 1 || z ~= 2
+    if z ~= 1 && z ~= 2
         input_slice(:,:,1) = dTrain(:,:,z-2);
         input_slice(:,:,2) = dTrain(:,:,z-1);
     end
@@ -60,7 +43,7 @@ for z = 1 : size(dTrain,3)
         input_slice(:,:,4) = dTrain(:,:,z+1);
         input_slice(:,:,5) = dTrain(:,:,z+1);
     end
-    if z ~= size(dTrain,3) || z~= size(dTrain,3) - 1
+    if z ~= size(dTrain,3) && z~= size(dTrain,3) - 1
         input_slice(:,:,4) = dTrain(:,:,z+1);
         input_slice(:,:,5) = dTrain(:,:,z+2);
     end

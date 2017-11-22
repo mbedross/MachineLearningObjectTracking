@@ -1,4 +1,4 @@
-function [ bugCoords ] = getBugCoords3( Dtrain, t, sections )
+function [bugCoords] = getBugCoords3( Dtrain, t, sections )
 %bugCoords returns a matrix of size N x 4 where each row of the matrix
 %represents the (x, y, z, t) coordinates of pixels that the user labelled as
 %bugs.
@@ -14,9 +14,6 @@ tempBugCoords = [0 0 0 0];
 for j = 1:sections
     for k = 1:sections
         for i = 1:dim3
-            j
-            k
-            i
             x1 = (k-1).*(dim1./sections)+1;
             y1 = (j-1).*(dim2./sections)+1;
             xSize = dim1./sections;
@@ -25,6 +22,7 @@ for j = 1:sections
             Dcrop = imcrop(Dtrain(:,:,i),[x1 y1 xSize ySize]);
             
             imshow(Dcrop);
+
             [xi, yi] = (getpts);
             x = x1 + xi;
             y = y1 +yi;

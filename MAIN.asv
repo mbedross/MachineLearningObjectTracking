@@ -7,17 +7,15 @@ function MAIN(varargin)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-global masterDir
 masterDir = varargin{1};
 if length(varargin) == 2
-    global trainDir
     trainDir = varargin{2};
 end
 
 % Very often, there is not enough RAM to load the entire xyzt stack to be
 % tracked. This means that it must be broken down into a subset of z and t
 % sets
-zRange = [-7, -6];
+zRange = [-1, 1];
 tRange = [0, 20];
 
 % Do you want to preProcess the data? 1 = yes, 0 = no
@@ -64,7 +62,7 @@ if train == 1
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
     [dTrain]    = import4D(masterDir, zSorted, times, zRange, tRange);
-    [b, Xtrain] = trainingStage1(dTrain);
+    [b, Xtrain] = trainingStage1(masterDir, zSorted, times, dtrain);
     [dTrainC]   = trainingStage2(dTrain, b, Xtrain);
     [b]         = trainingStage3(dTrainC);
 end

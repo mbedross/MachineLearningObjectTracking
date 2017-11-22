@@ -1,4 +1,4 @@
-function [times, zSorted] = preProcessing(masterDir)
+function [times, zSorted] = preProcessingMain(masterDir)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -9,6 +9,7 @@ function [times, zSorted] = preProcessing(masterDir)
 
 meanDir = fullfile(masterDir, 'MeanStack');
 mkdir(meanDir);
+global n
 
 innerRadius = 15;
 outerRadius = 300;
@@ -48,4 +49,4 @@ for i = 1 : length(type)
     end
 end
 % Save metaData before ending function
-save(fullfile(meanDir, 'metaData.mat'), times, zSorted)
+save(fullfile(meanDir, 'metaData.mat'), 'times', 'zSorted')
