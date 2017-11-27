@@ -42,5 +42,6 @@ if str == 'Y'
         b=new_b;
     end
 end
-filename = input('Where should the training data be saved? (e.g. C:\Users\manu\Desktop\TrainingData\Colwellia.mat');
+prompt = 'Where should the training data be saved? (e.g. C:\Users\manu\Desktop\TrainingData\Colwellia.mat) : ';
+filename = input(prompt,'s');
 save(filename, b, '-append')
