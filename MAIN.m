@@ -84,7 +84,7 @@ if track == 1
         for z = 1 : size(D,3)
             if z == 1
                 input_slice(:,:,1) = D(:,:,z, times(t));
-                input_slice(:,:,2) = D(:,:,z);
+                input_slice(:,:,2) = D(:,:,z, times(t));
             else
                 if z == 2
                     input_slice(:,:,1) = D(:,:,z-1, times(t));
@@ -95,11 +95,11 @@ if track == 1
                 end
             end
             input_slice(:,:,3) = D(:,:,z, times(t));
-            if z==dim3
+            if z==size(D,3)
                 input_slice(:,:,4) = D(:,:,z, times(t));
                 input_slice(:,:,5) = D(:,:,z, times(t));
             else
-                if z == dim3-1
+                if z == size(D,3)-1
                     input_slice(:,:,4) = D(:,:,z+1, times(t));
                     input_slice(:,:,5) = D(:,:,z+1, times(t));
                 else
