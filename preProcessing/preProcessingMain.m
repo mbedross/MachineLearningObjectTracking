@@ -13,8 +13,8 @@ global n
 
 innerRadius = 15;
 outerRadius = 300;
-centerX = n/2;
-centerY = n/2;
+centerX = n(1)/2;
+centerY = n(2)/2;
 mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
 
 % First, look through the master directory for duplicate holograms

@@ -11,7 +11,7 @@ function [mask] = makeMask(N, innerRadius, outerRadius, centerx, centery)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[x, y] = meshgrid((1:N), (1:N));
-mask = zeros(N,N);
+[x, y] = meshgrid((1:N(1)), (1:N(1)));
+mask = zeros(size(N));
 mask((x-centerx).^2 + (y-centery).^2 < outerRadius^2) = 1;
 mask((x-centerx).^2 + (y-centery).^2 < innerRadius^2) = 0;
