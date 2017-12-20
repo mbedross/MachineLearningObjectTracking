@@ -1,4 +1,4 @@
-function MAIN(varargin)
+function [varargout] = MAIN(varargin)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -56,21 +56,20 @@ function MAIN(varargin)
 preProcess = 0;
 
 % Do you want to run the training phases? 1 = yes, 0 = no
-train = 1;
+train = 0;
 
 % Do you want to track? 1 = yes, 0 = no
-track = 0;
+track = 1;
 
 % If you are training, define what time point you would like to train
-if train == 1
-    time = 10;
-end
+
 
 % Very often, there is not enough RAM to load the entire xyzt stack to be
 % tracked. This means that it must be broken down into a subset of z and t
 % sets
-zRange = [-7, -6];
-tRange = [0, 20];
+zRange = [-10, 10];
+tRange = [1, 5];
+time = tRange(1);
 
 % Define global variables
 global n
@@ -78,7 +77,7 @@ n = [2048 2048];
 
 % Which type of data do you want to track? Amplitude or Phase?
 global type
-type = 'Amplitude';
+type = "ampXphase";
 
 %% Misc. parameters
 
@@ -89,7 +88,7 @@ if length(varargin) == 2
     trainDir = varargin{2};
 end
 
-if length(varargin) ~=2 && train == 0
+if length(varargin) ~=2 && train == 0 && track == 1
     error('Without running the training protocol, a file path to training data must be provided. Either variable track must be 1 or more inputs are needed');
 end
 
@@ -125,65 +124,58 @@ if track == 1
     if train == 0 && length(varargin) == 2
         % If the dataset is already trained, load the model variables
         load(trainDir);
+        load(fullfile(masterDir, 'MeanStack','metaData.mat'))
+        [D]    = import4D(masterDir, zSorted, times, zRange, tRange);
+    else
+        D = dTrain;
     end
-    addpath('/supportingAlgorithms');
-    addpath('/createVideos');
-    D = dTrain;
+    % Add necessary directories to MATLAB PATH
+    addpath('.\supportingAlgorithms');
+    addpath('.\createVideos');
+    addpath('.\writeMatrix');
+    % Condition data set for tracking
     croppedD = cropEdges(D,cropSize);
     D = addEdges(croppedD,cropSize);
-    X = zeros(0,9);
-    for t = tRange(1) : tRange(2)
-        for z = 1 : size(D,3)
-            if z == 1
-                input_slice(:,:,1) = D(:,:,z, times(t));
-                input_slice(:,:,2) = D(:,:,z, times(t));
-            else
-                if z == 2
-                    input_slice(:,:,1) = D(:,:,z-1, times(t));
-                    input_slice(:,:,2) = D(:,:,z-1, times(t));
-                else
-                    input_slice(:,:,1) = D(:,:,z-2, times(t));
-                    input_slice(:,:,2) = D(:,:,z-1, times(t));
-                end
+    numZ = length(zSorted);
+    zStepsPerBatch = 20;
+    zBatches = floor(numZ/zStepsPerBatch);
+    % Find how many time sequences exist
+    times(times > tRange(2)) = [];
+    times(times < tRange(1)) = [];
+    tNF = length(times);
+    pointz = zeros(0,3);
+    X = zeros(n(1)*n(2)*zStepsPerBatch,9);
+    for t = 1 : tNF
+        for zB = 1 : zBatches
+            if zB == zBatches
+                zStepsPerBatch = zStepsPerBatch - 3;
             end
-            input_slice(:,:,3) = D(:,:,z, times(t));
-            if z==size(D,3)
-                input_slice(:,:,4) = D(:,:,z, times(t));
-                input_slice(:,:,5) = D(:,:,z, times(t));
-            else
-                if z == size(D,3)-1
-                    input_slice(:,:,4) = D(:,:,z+1, times(t));
-                    input_slice(:,:,5) = D(:,:,z+1, times(t));
+            for zStep = 1 : zStepsPerBatch
+                if zB == 1 && (zStep == 1 || zStep == 2)
+                    inputSlice = D(:, :, (zB-1)*zStepsPerBatch+1 : (zB-1)*zStepsPerBatch+5, t);
                 else
-                    input_slice(:,:,4) = D(:,:,z+1, times(t));
-                    input_slice(:,:,5) = D(:,:,z+2, times(t));
+                    inputSlice = D(:, :, (zB-1)*zStepsPerBatch+zStep-2 : (zB-1)*zStepsPerBatch+zStep+2, t);
                 end
+                xInterval = [(zStep-1)*n(1)*n(2)+1 zStep*n(1)*n(2)];
+                X(xInterval(1):xInterval(2),:) = getInputMatrixV5zs(inputSlice);
             end
-            X = [X; getInputMatrixV5zs(input_slice)];
+            y = glmval(b,X,'logit');
+            D_C = classify(y, pCutoff, minCluster, size(D,1),size(D,2),zStepsPerBatch);
+            tempPoints = findCentroids(D_C);
+            tempPoints(:,3) = (zB-1).*zStepsPerBatch+tempPoints(:,3);
+            pointz = [pointz; tempPoints];
         end
-        
-        %function glmval() is from statistical and machine learning
-        %toolbox. It calculates the probability of a pixel being bacteria
-        %by the pixel feature matrix 'X' and the weight vector 'b',
-        %which was found from training.
-        %----------------------------------------
-        y = glmval(b,X,'logit');
-        %------------------------------------------
-        
-        D_C = classify(y, pCutoff, minCluster, size(D,1),size(D,2),size(D,3),size(D,4));
-        
-        points{t} = findCentroids(D_C);
+        points{t} = pointz;
         points2{t} = points{t}*[360/size(D,1) 0 0;0 360/size(D,2) 0;0 0 z_separation];
-        %----------------------------------------------------------
         [tracks, adjacency_tracks] = simpletracker(points2, ...
             'MaxLinkingDistance', max_linking_distance, ...
             'MaxGapClosing', max_gap_closing);
-        %The function plotTracks, takes as input adjacency tracks and points to
-        %to plot the results in a 3D line graph.
-        
+        % Plot the current trajectories
         plotTracksAndVelocity(adjacency_tracks,points2);
         daspect([1 1 1])
-        createTracks
-        toc
     end
+    varargout{1} = points;
+    varargout{2} = points2;
+    varargout{3} = tracks;
+    varargout{4} = adjacency_tracks;
 end

@@ -15,8 +15,8 @@ function [b, Xtrain] = trainingStage1(dTrain)
 addpath('./supportingAlgorithms');
 cropSize = 15;
 
-bugCoords = getBugCoords3(dTrain, 1, 1);
-
+%bugCoords = getBugCoords3(dTrain, 1, 1);
+%save('BugCoords.mat', 'bugCoords')
 croppedDt = cropEdges(dTrain, cropSize);
 dTrain = addEdges(croppedDt, cropSize);
 

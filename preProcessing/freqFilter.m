@@ -15,6 +15,6 @@ function [I] = freqFilter(Img, mask, centerx, centery, N)
 
 Y = fftshift(fft2(Img));
 Fh = Y.*mask;
-fftshifted = imtranslate(Fh,[(N/2)-centerx, (N/2)-centery],'FillValues',0+0*1i);
+fftshifted = imtranslate(Fh,[(N(1)/2)-centerx, (N(2)/2)-centery],'FillValues',0+0*1i);
 Inew = ifft2(ifftshift(fftshifted));
 I = abs(Inew);

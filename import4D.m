@@ -42,7 +42,7 @@ times(times < tRange(1)) = [];
 tNF = length(times);
 
 % Begin loading images into dTrain
-I = uint8(zeros(n, n, zNF, tNF));
+I = uint8(zeros(n(1), n(2), zNF, tNF));
 for i = 1: zNF
     reconPath = fullfile(dataDir, 'MeanStack', char(type), sprintf('%0.2f', zSorted(i)));
     for t = 1 : length(times)

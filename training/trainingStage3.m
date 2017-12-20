@@ -6,7 +6,7 @@ function [b] = trainingStage3(dTrainC)
 zVal = 5;
 tVal = 1;
 
-[newCoords] = getBugMoreBugCoords(dTrainC, zVal, 1, tVal);
+%[newCoords] = getBugMoreBugCoords(dTrainC, zVal, 1, tVal);
 
 prompt = 'Would you like to add these points to bugCoords? Y/N: ';
 str = input(prompt,'s');
@@ -42,6 +42,3 @@ if str == 'Y'
         b=new_b;
     end
 end
-prompt = 'Where should the training data be saved? (e.g. C:\Users\manu\Desktop\TrainingData\Colwellia.mat) : ';
-filename = input(prompt,'s');
-save(filename, b, '-append')

@@ -11,8 +11,8 @@ meanDir = fullfile(masterDir, 'MeanStack');
 mkdir(meanDir);
 global n
 
-innerRadius = 15;
-outerRadius = 300;
+innerRadius = 10;
+outerRadius = 380;
 centerX = n(1)/2;
 centerY = n(2)/2;
 mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
@@ -21,7 +21,8 @@ mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
 [dupes] = findDuplicates(masterDir);
 
 % Now median subtract images (without duplicates)
-type = ["Amplitude", "Phase"];
+%type = ["Amplitude", "Phase"];
+type = "Amplitude";
 for i = 1 : length(type)
     zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(i))));
     NF = length(zSorted);
@@ -33,17 +34,17 @@ for i = 1 : length(type)
         % remove duplicate from times
         times(ismember(times, dupes)) = [];
         % Ntimes is the number of times in the reconstruction slice
-        I = zeros(n, n, length(times));
+        I = zeros(n(1), n(2), length(times));
         for t = 1 : length(times)
             I(:, :, t) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(t))));
-            %I_temp = freqFilter(I(:,:,t), mask, centerX, centerY, n);
-            %I(:,:,t) = I_temp;
         end
         I_mean = meanSubtraction(I);
         dataDir = fullfile(meanDir, char(type(i)), sprintf('%0.2f', zSorted(j)));
         mkdir(dataDir);
         % Now save the mean subtracted images
         for k = 1 : size(I_mean, 3)
+            %I_temp = freqFilter(I_mean(:,:,k), mask, centerX, centerY, n);
+            %I_mean(:,:,k) = I_temp;
             imwrite(I_mean(:,:,k), fullfile(dataDir, sprintf('%05d.tiff', times(k))))
         end
     end

@@ -21,7 +21,11 @@ for j = 1:sections
             
             Dcrop = imcrop(Dtrain(:,:,i),[x1 y1 xSize ySize]);
             
-            imshow(Dcrop);
+            imagesc(Dcrop)
+            axis equal
+            axis([0 size(Dcrop,1) 0 size(Dcrop,2)])
+            colormap gray
+            title('Select all in focus particles. Press ENTER to show next z-plane')
 
             [xi, yi] = (getpts);
             x = x1 + xi;
