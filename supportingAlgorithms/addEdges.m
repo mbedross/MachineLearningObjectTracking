@@ -18,4 +18,3 @@ else
     Dout = uint8(127.*ones(o_size1,o_size2,dim3,dim4));
 end
 Dout(i:o_size1-i,j:o_size2-j,:,:) = D(:,:,:,:);
-end

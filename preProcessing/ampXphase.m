@@ -17,7 +17,7 @@ mkdir(meanDir);
 
 % First, look through the master directory for duplicate holograms
 [dupes] = findDuplicates(masterDir);
-timePath = dir(fullfile(masterDir, 'MeanStack', 'Amplitude', sprintf('%0.2f', zSorted(1))));
+timePath = dir(fullfile(masterDir, 'Holograms'));
 NFt = length(timePath(not([timePath.isdir])));
 times = 0:NFt-1;
 % remove duplicate from times

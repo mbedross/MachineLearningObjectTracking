@@ -53,13 +53,13 @@ function [varargout] = MAIN(varargin)
 %% User defined criteria
 
 % Do you want to preProcess the data? 1 = yes, 0 = no
-preProcess = 1;
+preProcess = 0;
 
 % Do you want to run the training phases? 1 = yes, 0 = no
 train = 0;
 
 % Do you want to track? 1 = yes, 0 = no
-track = 0;
+track = 1;
 
 % If you are training, define what time point you would like to train
 
@@ -134,6 +134,10 @@ if track == 1
     addpath('.\createVideos');
     addpath('.\writeMatrix');
     
+    % Condition data set for tracking
+    croppedD = cropEdges(D,cropSize);
+    D = addEdges(croppedD,cropSize);
+    
     zRangeSorted = zSorted;
     zRangeSorted(zSorted > zRange(2)) = [];
     zRangeSorted(zSorted < zRange(1)) = [];
@@ -175,9 +179,6 @@ if track == 1
                         end
                     end
                 end
-                % Condition inputSlice variable
-                inputSlice = cropEdges(inputSlice,cropSize);
-                inputSlice = addEdges(inputSlice,cropSize);
                 xInterval = [(zStep-1)*n(1)*n(2)+1 zStep*n(1)*n(2)];
                 X(xInterval(1):xInterval(2),:) = getInputMatrixV5zs(inputSlice);
             end

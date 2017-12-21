@@ -42,7 +42,7 @@ for i = 1 : length(type)
         mkdir(dataDir);
         % Now save the mean subtracted images
         for k = 1 : size(I_mean, 3)
-            I_temp = freqFilter(I_mean(:,:,k), mask, centerX, centerY, n);
+            I_temp = freqFilter(I_mean(:,:,k).*255, mask, centerX, centerY, n);
             I_mean(:,:,k) = I_temp;
             imwrite(I_mean(:,:,k), fullfile(dataDir, sprintf('%05d.tiff', times(k))))
         end

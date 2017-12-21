@@ -5,12 +5,5 @@ function [ Dout ] = cropEdges( D,cropSize )
 
 dim1 = size(D,1);
 dim2 = size(D,2);
-dim3 = size(D,3);
-dim4 = size(D,4);
 
-i = cropSize;
-j = cropSize;
-
-Dout(:,:,:,:) = D(i:dim1-i,j:dim2-j,:,:);
-
-end
+Dout(:,:,:,:) = D(cropSize:dim1-cropSize,cropSize:dim2-cropSize,:,:);
