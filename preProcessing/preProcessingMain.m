@@ -22,6 +22,9 @@ mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
 
 % Now median subtract images (without duplicates)
 %type = ["Amplitude", "Phase"];
+if ismember('ampXphase',type)
+    ampXphase(masterDir);
+end
 for i = 1 : length(type)
     zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(i))));
     NF = length(zSorted);

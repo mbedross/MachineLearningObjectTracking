@@ -1,4 +1,4 @@
-function ampXphase(masterDir, results)
+function ampXphase(masterDir)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -12,7 +12,7 @@ poolobj = parpool;
 zSorted = zSteps(fullfile(masterDir, 'MeanStack', 'Amplitude'));
 NFz = length(zSorted);
 
-meanDir = fullfile(results, 'MeanStack','ampXphase');
+meanDir = fullfile(masterDir, 'MeanStack','ampXphase');
 mkdir(meanDir);
 
 % First, look through the master directory for duplicate holograms
@@ -24,8 +24,8 @@ times = 0:NFt-1;
 times(ismember(times, dupes)) = [];
 
 for z = 1 : NFz
-    ampPath = fullfile(masterDir, 'MeanStack', 'Amplitude', sprintf('%0.2f', zSorted(z)));
-    phasePath = fullfile(masterDir, 'MeanStack', 'Phase', sprintf('%0.2f', zSorted(z)));
+    ampPath = fullfile(masterDir, 'Stack', 'Amplitude', sprintf('%0.2f', zSorted(z)));
+    phasePath = fullfile(masterDir, 'Stack', 'Phase', sprintf('%0.2f', zSorted(z)));
     dataDir = fullfile(meanDir, sprintf('%0.2f', zSorted(z)));
     mkdir(dataDir);
     parfor t = 1 : length(times)

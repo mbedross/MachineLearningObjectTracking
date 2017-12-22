@@ -14,13 +14,12 @@ function [I_mean] = meanSubtraction(I)
 
 
 x = class(I);
-
+% Calculate median image
+Mean = mean(I,3);
+t = size(I,3);
+        
 switch x
     case 'double'
-        % Calculate median image
-        Mean = mean(I,3);
-        t = size(I,3);
-        % Subtract median image from each time point
         for t = 1 : t
             I(:,:,t) = I(:,:,t) - Mean;
             % Normalize images to prevent flaring
@@ -32,10 +31,6 @@ switch x
             I(:,:,t) = I_int;
         end    
     case 'uint8'
-        % Calculate median image
-        Mean = mean(I,3);
-        t = size(I,3);
-        % Subtract median image from each time point
         for t = 1 : t
             I(:,:,t) = I(:,:,t) - Mean;
             % Normalize images to prevent flaring

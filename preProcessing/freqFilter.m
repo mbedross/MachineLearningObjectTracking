@@ -12,6 +12,7 @@ function [I] = freqFilter(Img, mask, centerx, centery, N)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+x = class(Img);
 
 Y = fft2(Img);
 Y = fftshift(Y);
@@ -20,3 +21,16 @@ fftshifted = imtranslate(Fh,[(N(1)/2)-centerx, (N(2)/2)-centery],'FillValues',0+
 Inew = ifftshift(fftshifted);
 Inew = ifft2(Inew);
 I = real(Inew);
+I = (I-min(I(:)))./(max(I(:))-min(I(:)));
+
+% Normalize image to prevent flaring
+switch x
+    case 'double'
+        I = I+(0.5-mean(I(:)));
+        I(I<0) = 0;
+        I(I>1) = 1;
+    case 'uint8'
+        I(:,:,t) = I+(127-mean(I(:)));
+        I(I<0) = 0;
+        I(I>255) = 255;
+end
