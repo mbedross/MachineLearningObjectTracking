@@ -1,9 +1,9 @@
 % % %function plotTracksOnVideo(tracks, points, numFrames,imgScaleFactor,contrastFactor)
 clearvars imStack x0 y0 z0 u v w x1 y1 z1 relTracks
 tStart = 1;
-vidSize = 139;
+vidSize = 85;
 minTrackLength = 10;
-tEnd = 195;
+tEnd = 85;
 z = 120;
 numFrames =0;
 imgScaleFactor =1;
@@ -26,19 +26,14 @@ for i = 1:size(allTracks,1)
 end
 % 
 k=1;
-for t = tStart:tEnd
-%for t = 1:91
-    if any(t==replicated)
-        % Do nothing
-    else
-        %[imgA,imgB] = getMedianImg(z,t,tEnd,numFrames, imgScaleFactor);
-        [imgA,imgB] = returnMedianImgAndImg(z,t,tEnd,numFrames, imgScaleFactor);
-        %I(:,:,t) = uint8((int16(imgA) - int16(imgB)).*contrastFactor+127);
-        I(:,:,k) = imgA;
-        k=k+1;
-        acquiring_images_percent_completed = (t-tStart)*100/vidSize
-    end
-end
+% for t = tStart:tEnd
+%     %[imgA,imgB] = getMedianImg(z,t,tEnd,numFrames, imgScaleFactor);
+%     [imgA,imgB] = returnMedianImgAndImg(z,t,tEnd,numFrames, imgScaleFactor);
+%     %I(:,:,t) = uint8((int16(imgA) - int16(imgB)).*contrastFactor+127);
+%     I(:,:,k) = imgA;
+%     k=k+1;
+%     acquiring_images_percent_completed = (t-tStart)*100/vidSize
+% end
 % 
 for i = 1:size(relTracks,2)
     
@@ -68,8 +63,8 @@ end
 trailSize = 15;
 
 for t = tStart+1:tStart+vidSize-1
-    imshow(I(:,:,t))
-    hold on
+%     imshow(I(:,:,t))
+%     hold on
    
         
         for i=1:size(relTracks,2)
@@ -81,6 +76,8 @@ for t = tStart+1:tStart+vidSize-1
             
             %q = quiver(x0(1:t,i),y0(1:t,i),u(1:t,i),v(1:t,i),0);
             q = quiver3(x0(t-r+1:t,i),y0(t-r+1:t,i),z0(t-r+1:t,i),u(t-r+1:t,i),v(t-r+1:t,i),w(t-r+1:t,i),0);
+            hold on
+            drawnow
             %set(q,'Color',(de2bi(rem(i,27),3,3))./2);
             %set(q,'Color',(de2bi(rem(i,8),3,2)));
             set(q,'LineStyle','--');

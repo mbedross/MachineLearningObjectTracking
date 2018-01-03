@@ -22,9 +22,6 @@ mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
 
 % Now median subtract images (without duplicates)
 %type = ["Amplitude", "Phase"];
-if ismember('ampXphase',type)
-    ampXphase(masterDir);
-end
 for i = 1 : length(type)
     zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(i))));
     NF = length(zSorted);
@@ -45,7 +42,7 @@ for i = 1 : length(type)
         mkdir(dataDir);
         % Now save the mean subtracted images
         for k = 1 : size(I_mean, 3)
-            I_temp = freqFilter(I_mean(:,:,k), mask, centerX, centerY, n);
+            I_temp = freqFilter(I_mean(:,:,k).*255, mask, centerX, centerY, n);
             I_mean(:,:,k) = I_temp;
             imwrite(I_mean(:,:,k), fullfile(dataDir, sprintf('%05d.tiff', times(k))))
         end

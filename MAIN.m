@@ -53,13 +53,13 @@ function [varargout] = MAIN(varargin)
 %% User defined criteria
 
 % Do you want to preProcess the data? 1 = yes, 0 = no
-preProcess = 1;
+preProcess = 0;
 
 % Do you want to run the training phases? 1 = yes, 0 = no
 train = 0;
 
 % Do you want to track? 1 = yes, 0 = no
-track = 0;
+track = 1;
 
 % If you are training, define what time point you would like to train
 
@@ -69,7 +69,7 @@ track = 0;
 % sets
 zRange = [-10, 10];
 z_separation = 2.5;
-tRange = [1, 5];
+tRange = [1, 120];
 time = tRange(1);
 
 % Define global variables
@@ -158,20 +158,23 @@ if track == 1
                 tempTime = find(times == timesRange(t));
                 tempZ = (zB-1)*zStepsPerBatch+zStep;
                 if zB == 1 && (zStep == 1 || zStep == 2)
-                    importData = [tempZ*tNF+tempTime+1 tempZ*tNF+tempTime+5];
+                    importData = (tempZ-1)*tNF+tempTime;
                     for zz = 0 : 4
-                        inputSlice(:,:,zz+1) = readimage(ds, importData(1)+zz);
+                        importSlice = importData+zz*tNF;
+                        inputSlice(:,:,zz+1) = readimage(ds, importSlice);
                     end
                 else
                     if zB == zBatches && (zStep == zStepsPerBatch - 1 || zStep == zStepsPerBatch)
-                        importData = [tempZ*tNF+tempTime-4 tempZ*tNF+tempTime];
+                        importData = (tempZ-4)*tNF+tempTime;
                         for zz = 0 : 4
-                            inputSlice(:,:,zz+1) = readimage(ds, importData(1)+zz);
+                            importSlice = importData+zz*tNF;
+                            inputSlice(:,:,zz+1) = readimage(ds, importSlice);
                         end
                     else
-                        importData = [tempZ*tNF+tempTime-2 tempZ*tNF+tempTime+2];
+                        importData = (tempZ-2)*tNF+tempTime;
                         for zz = 0 : 4
-                            inputSlice(:,:,zz+1) = readimage(ds, importData(1)+zz);
+                            importSlice = importData+zz*tNF;
+                            inputSlice(:,:,zz+1) = readimage(ds, importSlice);
                         end
                     end
                 end
@@ -182,22 +185,25 @@ if track == 1
                 X(xInterval(1):xInterval(2),:) = getInputMatrixV5zs(inputSlice);
             end
             y = glmval(b,X,'logit');
-            D_C = classify(y, pCutoff, minCluster, size(D,1),size(D,2),zStepsPerBatch);
+            D_C = classify(y, pCutoff, minCluster, n(1),n(2),zStepsPerBatch);
             tempPoints = findCentroids(D_C);
             tempPoints(:,3) = (zB-1).*zStepsPerBatch+tempPoints(:,3);
             pointz = [pointz; tempPoints];
         end
         points{t} = pointz;
-        points2{t} = points{t}*[360/size(D,1) 0 0;0 360/size(D,2) 0;0 0 z_separation];
+        points2{t} = points{t}*[360/n(1) 0 0;0 360/n(2) 0;0 0 z_separation];
         [tracks, adjacency_tracks] = simpletracker(points2, ...
             'MaxLinkingDistance', max_linking_distance, ...
             'MaxGapClosing', max_gap_closing);
-        % Plot the current trajectories
-        plotTracksAndVelocity(adjacency_tracks,points2);
-        daspect([1 1 1])
+        disp(t)
     end
     varargout{1} = points;
     varargout{2} = points2;
     varargout{3} = tracks;
     varargout{4} = adjacency_tracks;
+    % Plot the current trajectories
+    plotTracksAndVelocity(adjacency_tracks,points2);
+    daspect([1 1 1])
 end
+
+delete(poolobj)
