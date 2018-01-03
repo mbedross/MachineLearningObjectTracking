@@ -1,2 +1,3 @@
-# Thesis_object_tracking_software
-This is the final code used to obtain the results of my Master's Thesis
+# Machine Learning Object Tracking (MLOT)
+
+Detailed description of algorithm to be written. Please refer to beginning section of MAIN.m for more details in the meantime.
