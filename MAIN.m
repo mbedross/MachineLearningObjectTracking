@@ -192,18 +192,15 @@ if track == 1
         end
         points{t} = pointz;
         points2{t} = points{t}*[360/n(1) 0 0;0 360/n(2) 0;0 0 z_separation];
-        [tracks, adjacency_tracks] = simpletracker(points2, ...
-            'MaxLinkingDistance', max_linking_distance, ...
-            'MaxGapClosing', max_gap_closing);
-        disp(t)
     end
     varargout{1} = points;
     varargout{2} = points2;
-    varargout{3} = tracks;
-    varargout{4} = adjacency_tracks;
-    % Plot the current trajectories
+    % Plot the trajectories
+    [tracks, adjacency_tracks] = simpletracker(points2, ...
+        'MaxLinkingDistance', max_linking_distance, ...
+        'MaxGapClosing', max_gap_closing);
     plotTracksAndVelocity(adjacency_tracks,points2);
     daspect([1 1 1])
+    varargout{3} = tracks;
+    varargout{4} = adjacency_tracks;
 end
-
-delete(poolobj)
