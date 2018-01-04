@@ -117,7 +117,7 @@ if train == 1
     [dTrain]    = import3D(masterDir, zSorted, time, zRange);
     [b, Xtrain] = trainingStage1(dTrain);
     [dTrainC]   = trainingStage2(dTrain, b, Xtrain);
-    [b]         = trainingStage3(dTrainC);
+    %[b]         = trainingStage3(dTrainC);
 end
 if track == 1
     if train == 0 && length(varargin) == 2
@@ -195,8 +195,9 @@ if track == 1
     end
     varargout{1} = points;
     varargout{2} = points2;
+    pointsNEW = formatPoints(points2);
     % Plot the trajectories
-    [tracks, adjacency_tracks] = simpletracker(points2, ...
+    [tracks, adjacency_tracks] = simpletracker(pointsNEW, ...
         'MaxLinkingDistance', max_linking_distance, ...
         'MaxGapClosing', max_gap_closing);
     plotTracksAndVelocity(adjacency_tracks,points2);
