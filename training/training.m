@@ -1,4 +1,4 @@
-function [b, Xtrain] = trainingStage1(dTrain)
+function [b, Xtrain] = training(dTrain)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -10,13 +10,22 @@ function [b, Xtrain] = trainingStage1(dTrain)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+global masterDir
+
 % First import mean subtracted and filtered reconstructions into a four
 % dimensional matrix dTrain = XxYxZxt
 addpath('./supportingAlgorithms');
 cropSize = 15;
 
-bugCoords = getBugCoords3(dTrain, 1, 1);
-save('BugCoords.mat', 'bugCoords')
+filename = uiputfile('*.mat','Save Training Data File');
+
+coordName = fullfile(masterDir, 'BugCoords.mat');
+if exist(coordName, 'file') == 2
+    load(coordName);
+else
+    bugCoords = getBugCoords3(dTrain, 1, 1);
+    save(coordName, 'bugCoords')
+end
 croppedDt = cropEdges(dTrain, cropSize);
 dTrain = addEdges(croppedDt, cropSize);
 
@@ -66,3 +75,9 @@ yTrain = yCoords(:);
 tic
 [b,dev] = glmfit(Xtrain,yTrain,'binomial','link','logit');
 toc
+
+if exist(filename, 'file') == 2
+    save(filename, 'b', '-append')
+else
+    save(filename, 'b')
+end

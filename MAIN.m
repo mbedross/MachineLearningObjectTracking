@@ -1,4 +1,4 @@
-function [varargout] = MAIN(varargin)
+function [varargout] = MAIN
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -83,15 +83,7 @@ type = "ampXphase";
 %% Misc. parameters
 
 global masterDir
-masterDir = varargin{1};
-if length(varargin) == 2
-    global trainDir
-    trainDir = varargin{2};
-end
-
-if length(varargin) ~=2 && train == 0 && track == 1
-    error('Without running the training protocol, a file path to training data must be provided. Either variable track must be 1 or more inputs are needed');
-end
+masterDir = uigetdir('Choose Data Parent Directory');
 
 % Define tracking parameters
 max_linking_distance = 30;
@@ -115,13 +107,12 @@ if train == 1
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
     [dTrain]    = import3D(masterDir, zSorted, time, zRange);
-    [b, Xtrain] = trainingStage1(dTrain);
-    [dTrainC]   = trainingStage2(dTrain, b, Xtrain);
-    %[b]         = trainingStage3(dTrainC);
+    [b, Xtrain] = training(dTrain);
 end
 if track == 1
     if train == 0 && length(varargin) == 2
         % If the dataset is already trained, load the model variables
+        trainDir = uigetdir('*.mat','Choose Training Data file');
         load(trainDir);
         load(fullfile(masterDir, 'MeanStack','metaData.mat'))
     end
