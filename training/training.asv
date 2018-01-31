@@ -17,8 +17,9 @@ global masterDir
 addpath('./supportingAlgorithms');
 cropSize = 15;
 
-[trainFileName, trainPath] = uiputfile('*.mat','Choose Where to Save Training Data file');
-filename = fullfile(trainPath, trainFileName);
+filename = uiputfile('*.mat','Save Training Data File');
+[trainFileName, trainPath] = uigetfile('*.mat','Choose Training Data file');
+trainDir = fullfile(trainPath, trainFileName);
 
 coordName = fullfile(masterDir, 'BugCoords.mat');
 if exist(coordName, 'file') == 2

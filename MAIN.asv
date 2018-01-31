@@ -69,7 +69,7 @@ track = 1;
 % sets
 zRange = [-13, 7];
 z_separation = 2.5;
-tRange = [1, 300];
+tRange = [1, 216];
 time = tRange(1);
 
 % Define global variables
@@ -192,6 +192,8 @@ if track == 1
     [tracks, adjacency_tracks] = simpletracker(pointsNEW, ...
         'MaxLinkingDistance', max_linking_distance, ...
         'MaxGapClosing', max_gap_closing);
+    plotTracksAndVelocity(adjacency_tracks,points2);
+    daspect([1 1 1])
     varargout{3} = tracks;
     varargout{4} = adjacency_tracks;
 end
