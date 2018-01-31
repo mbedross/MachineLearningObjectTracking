@@ -78,7 +78,7 @@ n = [2048 2048];
 
 % Which type of data do you want to track? Amplitude or Phase?
 global type
-type = "Phase";
+type = {'Phase'};
 
 %% Misc. parameters
 
@@ -110,12 +110,26 @@ if train == 1
     [b, Xtrain] = training(dTrain);
 end
 if track == 1
+    
+    % If the dataset is already trained, load the model variables
     if train == 0
-        % If the dataset is already trained, load the model variables
         [trainFileName, trainPath] = uigetfile('*.mat','Choose Training Data file');
         trainDir = fullfile(trainPath, trainFileName);
         load(trainDir);
         load(fullfile(masterDir, 'MeanStack','metaData.mat'))
+    end
+    
+    % If tracking data already exists, load it
+    % This is a temporary file that saves after each iteration in order to
+    % prevent data loss as a result of an error or power failure
+    trackData = fullfile(masterDir,'tempTrackData.mat');
+    if exist(trackData, 'file') == 2
+        load(trackData)
+        %save(filename, 'b', '-append')
+        latestTime = t;
+        clear t
+    else
+        latestTime = 1;
     end
     
     % Create Image Datastore of entire XYZt stack
@@ -123,8 +137,6 @@ if track == 1
     
     % Add necessary directories to MATLAB PATH
     addpath('.\supportingAlgorithms');
-    addpath('.\createVideos');
-    addpath('.\writeMatrix');
     
     zRangeSorted = zSorted;
     zRangeSorted(zSorted > zRange(2)) = [];
@@ -143,7 +155,7 @@ if track == 1
     pointz = zeros(0,3);
     X = zeros(n(1)*n(2)*zStepsPerBatch,9);
     inputSlice = zeros(n(1), n(1), 5);
-    for t = 1 : numT
+    for t = latestTime : numT
         for zB = 1 : zBatches
             for zStep = 1 : zStepsPerBatch
                 % calculate which entry in image datastore to import
@@ -182,16 +194,25 @@ if track == 1
             tempPoints(:,3) = (zB-1).*zStepsPerBatch+tempPoints(:,3);
             pointz = [pointz; tempPoints];
         end
+        save(trackData, '-regexp', '^(?!(X)$).') % Save temporary workspace
         points{t} = pointz;
         points2{t} = points{t}*[360/n(1) 0 0;0 360/n(2) 0;0 0 z_separation];
     end
     varargout{1} = points;
     varargout{2} = points2;
     pointsNEW = formatPoints(points2);
-    % Plot the trajectories
     [tracks, adjacency_tracks] = simpletracker(pointsNEW, ...
         'MaxLinkingDistance', max_linking_distance, ...
         'MaxGapClosing', max_gap_closing);
     varargout{3} = tracks;
     varargout{4} = adjacency_tracks;
+    
+    % Save final Track Results
+    trackResultsDir = fullfile(masterDir,'Tracking Results');
+    mkdir(trackResultsDir);
+    trackResultsFile = fullfile(trackResultsDir,'tracks.mat');
+    save(trackResultsFile, '-regexp', '^(?!(X)$).')
+    
+    % Delete temporary track file
+    delete(trackData)
 end
