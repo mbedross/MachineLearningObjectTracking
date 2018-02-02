@@ -50,18 +50,15 @@ function [varargout] = MAIN
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% User defined criteria
+%% Ask user for inputs
 
-% Do you want to preProcess the data? 1 = yes, 0 = no
-preProcess = 0;
+addpath('.\GUI')
+global type
+[preProcess, train, track, type, Quit] = initGUI();
 
-% Do you want to run the training phases? 1 = yes, 0 = no
-train = 0;
-
-% Do you want to track? 1 = yes, 0 = no
-track = 1;
-
-% If you are training, define what time point you would like to train
+if Quit == 1
+    return
+end
 
 
 % Very often, there is not enough RAM to load the entire xyzt stack to be
@@ -75,10 +72,6 @@ time = tRange(1);
 % Define global variables
 global n
 n = [2048 2048];
-
-% Which type of data do you want to track? Amplitude or Phase?
-global type
-type = {'Phase'};
 
 %% Misc. parameters
 
