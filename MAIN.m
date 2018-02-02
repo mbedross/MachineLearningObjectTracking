@@ -28,6 +28,12 @@ function [varargout] = MAIN
 % user defined directory. The training algorithm will prompt the user for
 % this information at the end of the routine.
 %
+% NOTE: The variable trainZrange defaults to the center 10 z-slices of the
+% reconstruction. These are the z-slices that are presented to the user for
+% the code to train with. If you would like to specify a different
+% trainZrange, find the variable in the code (using the FIND feature) and
+% relace the z range bounds by your desired value.
+%
 % 3. Tracking conducts the tracking algorithm based on information for the
 % training section.
 %
@@ -52,6 +58,12 @@ function [varargout] = MAIN
 
 %% Ask user for inputs
 
+% These next few lines will be replaced by a GUI soon!
+zRange = [-13, 7];  % This is the zRange you would like to track
+z_separation = 2.5; % This is the physical separation between z-slices (in microns)
+tRange = [1, 300];  % This is the time range you would like to track
+time = tRange(1);   % This is the time point that you would like to train
+
 addpath('.\GUI')
 global type
 [preProcess, train, track, type, Quit] = initGUI();
@@ -59,15 +71,6 @@ global type
 if Quit == 1
     return
 end
-
-
-% Very often, there is not enough RAM to load the entire xyzt stack to be
-% tracked. This means that it must be broken down into a subset of z and t
-% sets
-zRange = [-13, 7];
-z_separation = 2.5;
-tRange = [1, 300];
-time = tRange(1);
 
 % Define global variables
 global n
@@ -87,6 +90,7 @@ pCutoff = 0.005;
 minCluster = 10;
 cropSize = 15;
 
+
 %% Main section
 % Add the preprocess and training subdolders to MATLAB search path, and run
 % the respective functions if applicable
@@ -99,7 +103,8 @@ if train == 1
     if preProcess == 0
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
-    [dTrain]    = import3D(masterDir, zSorted, time, zRange);
+    trainZrange = [zsorted(length(zSorted)/2), zsorted(length((zSorted)/2)+10)]; 
+    [dTrain]    = import3D(masterDir, zSorted, time, trainZrange);
     [b, Xtrain] = training(dTrain);
 end
 if track == 1
