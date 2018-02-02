@@ -45,5 +45,3 @@ xlabel('Distance [\mum]')
 ylabel('Distance [\mum]')
 zlabel('Distance [\mum]')
 ylabel(h, 'Time [s]')
-
-print('XYZttracks','-dpng','-r500')

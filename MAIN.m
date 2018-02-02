@@ -200,6 +200,9 @@ if track == 1
     varargout{3} = tracks;
     varargout{4} = adjacency_tracks;
     
+    % Calculate average swimming speeds
+    [velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);
+    
     % Save final Track Results
     trackResultsDir = fullfile(masterDir,'Tracking Results');
     mkdir(trackResultsDir);
@@ -208,4 +211,7 @@ if track == 1
     
     % Delete temporary track file
     delete(trackData)
+    
+    % Plot results
+    createPlot(pointsNEW, adjacency_tracks, times)
 end

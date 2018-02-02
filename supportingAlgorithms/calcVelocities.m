@@ -53,3 +53,5 @@ A = zeros(0,1);
 for i = 1: length(Speed)
     A = [A Speed{i}'];
 end
+
+histogram(A)
