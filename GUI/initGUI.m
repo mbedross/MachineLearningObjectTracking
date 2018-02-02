@@ -51,9 +51,12 @@ function initGUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to initGUI (see VARARGIN)
-global dataType Quit
+global dataType preProcess train track  Quit
 dataType = {'', '', ''};
 Quit = 0;
+preProcess = 0;
+train = 0;
+track = 0;
 
 % Choose default command line output for initGUI
 handles.output = hObject;
