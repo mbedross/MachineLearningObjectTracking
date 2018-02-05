@@ -61,7 +61,7 @@ function [varargout] = MAIN
 % These next few lines will be replaced by a GUI soon!
 zRange = [-13, 7];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
-tRange = [1, 300];  % This is the time range you would like to track
+tRange = [1, 199];  % This is the time range you would like to track
 time = tRange(1);   % This is the time point that you would like to train
 
 addpath('.\GUI')
@@ -103,7 +103,7 @@ if train == 1
     if preProcess == 0
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
-    trainZrange = [zsorted(length(zSorted)/2), zsorted(length((zSorted)/2)+10)]; 
+    trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1]; 
     [dTrain]    = import3D(masterDir, zSorted, time, trainZrange);
     [b, Xtrain] = training(dTrain);
 end

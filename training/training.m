@@ -24,7 +24,7 @@ coordName = fullfile(masterDir, 'BugCoords.mat');
 if exist(coordName, 'file') == 2
     load(coordName);
 else
-    bugCoords = getBugCoords3(dTrain, 1, 1);
+    bugCoords = getBugCoords(dTrain, 1);
     save(coordName, 'bugCoords')
 end
 croppedDt = cropEdges(dTrain, cropSize);
