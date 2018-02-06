@@ -1,9 +1,14 @@
-function [times, zSorted] = preProcessingMain(masterDir)
+function [times, zSorted] = preProcessingGPU(masterDir)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % This function takes in a reconstruction stack and pre-processes it,
 % getting it ready for ML tracking.
+%
+% This is only to be called when the user wants to use GPU parallelization.
+% This depends on the capabilities of the GPU on the machine this is to run
+% on. Check GPU specs before using and/or contact Manuel Bedrossian
+% (mbedross@caltech.edu)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -15,7 +20,7 @@ innerRadius = 30;
 outerRadius = 230;
 centerX = n(1)/2;
 centerY = n(2)/2;
-mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
+mask = makeMaskGPU(n, innerRadius, outerRadius, centerX, centerY);
 
 % First, look through the master directory for duplicate holograms
 [dupes] = findDuplicates(masterDir);
@@ -33,18 +38,18 @@ for i = 1 : length(type)
         % remove duplicate from times
         times(ismember(times, dupes)) = [];
         % Ntimes is the number of times in the reconstruction slice
-        I = zeros(n(1), n(2), length(times));
+        I = gpuArray(zeros(n(1), n(2), length(times)));
         for t = 1 : length(times)-1
             I(:, :, t) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(t+1))));
         end
-        I_mean = meanSubtraction(I);
+        I_mean = meanSubtractionGPU(I);
         dataDir = fullfile(meanDir, char(type(i)), sprintf('%0.2f', zSorted(j)));
         mkdir(dataDir);
         % Now save the mean subtracted images
         for k = 1 : size(I_mean, 3)
-            I_temp = freqFilter(I_mean(:,:,k).*255, mask, centerX, centerY, n);
-            I_mean(:,:,k) = I_temp;
-            imwrite(I_mean(:,:,k), fullfile(dataDir, sprintf('%05d.tiff', times(k))))
+            I_temp = freqFilterGPU(I_mean(:,:,k).*255, mask, centerX, centerY, n);
+            I_temp = gather(I_temp);
+            imwrite(I_temp, fullfile(dataDir, sprintf('%05d.tiff', times(k))))
         end
     end
 end

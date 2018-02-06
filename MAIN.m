@@ -68,13 +68,15 @@ addpath('.\GUI')
 global type
 [preProcess, train, track, type, Quit] = initGUI();
 
+if preProcess == 1
+    GPU = questdlg('Would you like to use GPU parallelization for Pre-Processing? NOTE: This is only to be called when the user wants to use GPU parallelization. This depends on the capabilities of the GPU on the machine this is to run on. Check GPU specs before using and/or contact Manuel Bedrossian (mbedross@caltech.edu)', ...
+	'GPU Parallelization', ...
+	'Yes','No','No');
+end
+
 if Quit == 1
     return
 end
-
-% Define global variables
-global n
-n = getImageSize(time);
 
 %% Misc. parameters
 
@@ -92,14 +94,25 @@ cropSize = 15;
 
 % Add necessary directories to MATLAB PATH
 addpath('.\supportingAlgorithms');
+addpath('.\preProcessing');
 
+% Define global variables
+global n
+zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(1))));
+n = getImageSize(time, zSorted);
 
 %% Main section
 % Add the preprocess and training subdolders to MATLAB search path, and run
 % the respective functions if applicable
 if preProcess == 1
     addpath('.\preProcessing');
-    [times, zSorted] = preProcessingMain(masterDir);
+    addpath('.\preProcessingGPU');
+    switch GPU
+        case 'Yes'
+            [times, zSorted] = preProcessingGPU(masterDir);
+        case 'No'
+            [times, zSorted] = preProcessingMain(masterDir);
+    end
 end
 if train == 1
     addpath('.\training');

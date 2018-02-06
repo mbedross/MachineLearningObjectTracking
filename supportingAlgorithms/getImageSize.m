@@ -1,4 +1,4 @@
-function n = getImageSize(time)
+function n = getImageSize(time, zSorted)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -9,7 +9,7 @@ function n = getImageSize(time)
 
 global type masterDir
 
-reconPath = fullfile(masterDir, 'MeanStack', char(type(1)), sprintf('%0.2f', zSorted(1)));
+reconPath = fullfile(masterDir, 'Stack', char(type(1)), sprintf('%0.2f', zSorted(1)));
 I = imread(fullfile(reconPath, sprintf('%05d.tiff', time)));
 [N, M] = size(I);
 
