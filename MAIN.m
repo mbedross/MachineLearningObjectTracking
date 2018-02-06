@@ -1,4 +1,4 @@
-function [varargout] = MAIN
+function MAIN
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -74,7 +74,7 @@ end
 
 % Define global variables
 global n
-n = [2048 2048];
+n = getImageSize(time);
 
 %% Misc. parameters
 
@@ -90,6 +90,9 @@ pCutoff = 0.005;
 minCluster = 10;
 cropSize = 15;
 
+% Add necessary directories to MATLAB PATH
+addpath('.\supportingAlgorithms');
+
 
 %% Main section
 % Add the preprocess and training subdolders to MATLAB search path, and run
@@ -104,11 +107,10 @@ if train == 1
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
     trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1]; 
-    [dTrain]    = import3D(masterDir, zSorted, time, trainZrange);
+    [dTrain]    = import3D(zSorted, time, trainZrange);
     [b, Xtrain] = training(dTrain);
 end
 if track == 1
-    
     % If the dataset is already trained, load the model variables
     if train == 0
         [trainFileName, trainPath] = uigetfile('*.mat','Choose Training Data file');
@@ -116,14 +118,12 @@ if track == 1
         load(trainDir);
         load(fullfile(masterDir, 'MeanStack','metaData.mat'))
     end
-    
     % If tracking data already exists, load it
     % This is a temporary file that saves after each iteration in order to
     % prevent data loss as a result of an error or power failure
     trackData = fullfile(masterDir,'tempTrackData.mat');
     if exist(trackData, 'file') == 2
         load(trackData)
-        %save(filename, 'b', '-append')
         latestTime = t;
         clear t
     else
@@ -131,10 +131,7 @@ if track == 1
     end
     
     % Create Image Datastore of entire XYZt stack
-    [ds] = import4D(masterDir, zSorted, times, zRange, tRange);
-    
-    % Add necessary directories to MATLAB PATH
-    addpath('.\supportingAlgorithms');
+    [ds] = import4D(zSorted, zRange);
     
     zRangeSorted = zSorted;
     zRangeSorted(zSorted > zRange(2)) = [];
@@ -196,14 +193,10 @@ if track == 1
         points{t} = pointz;
         points2{t} = points{t}*[360/n(1) 0 0;0 360/n(2) 0;0 0 z_separation];
     end
-    varargout{1} = points;
-    varargout{2} = points2;
     pointsNEW = formatPoints(points2);
     [tracks, adjacency_tracks] = simpletracker(pointsNEW, ...
         'MaxLinkingDistance', max_linking_distance, ...
         'MaxGapClosing', max_gap_closing);
-    varargout{3} = tracks;
-    varargout{4} = adjacency_tracks;
     
     % Calculate average swimming speeds
     [velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);

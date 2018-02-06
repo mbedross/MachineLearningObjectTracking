@@ -11,8 +11,8 @@ meanDir = fullfile(masterDir, 'MeanStack');
 mkdir(meanDir);
 global n type
 
-innerRadius = 5;
-outerRadius = 2048;
+innerRadius = 30;
+outerRadius = 230;
 centerX = n(1)/2;
 centerY = n(2)/2;
 mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
