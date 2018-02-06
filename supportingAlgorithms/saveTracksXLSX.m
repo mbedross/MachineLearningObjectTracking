@@ -9,12 +9,7 @@ function saveTracksXLSX(points, adjacencyTracks, times, fileName)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global masterDir
 allPoints = vertcat(points{:});
-
-% Account for flipped z (this is because of the way numerical
-% reconstructions occur and will be fixed later
 maxes = max(allPoints);
-allPoints(:,3) = maxes(3) -allPoints(:,3); 
-
 nTracks = size(adjacencyTracks,1);
 
 % Import timestamp file to calculate velocities
@@ -24,7 +19,7 @@ clear timeOfDay Date stamp
 time = time./1000;                              % Convert time from ms to s
 
 ImgTimes = time(times);
-
+ii = 1;
 for i = 1 : nTracks
     index = adjacencyTracks{i,1};
     if length(index)>=6
@@ -40,6 +35,12 @@ for i = 1 : nTracks
                 end
             end
         end
-        xlswrite(fileName,coords,i)
+        % Account for flipped z (this is because of the way numerical
+        % reconstructions occur and will be fixed later
+        coords(:,3) = maxes(3) - coords(:,3);
+        
+        warning('off', 'MATLAB:xlswrite:AddSheet');
+        xlswrite(fileName,coords,ii)
+        ii = ii +1;
     end
 end

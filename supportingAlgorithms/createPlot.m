@@ -9,12 +9,7 @@ function createPlot(points, adjacencyTracks, times)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 global masterDir
 allPoints = vertcat(points{:});
-
-% Account for flipped z (this is because of the way numerical
-% reconstructions occur and will be fixed later
 maxes = max(allPoints);
-allPoints(:,3) = maxes(3) -allPoints(:,3); 
-
 nTracks = size(adjacencyTracks,1);
 
 % Import timestamp file to calculate velocities
@@ -40,6 +35,10 @@ for i = 1 : nTracks
                 end
             end
         end
+        % Account for flipped z (this is because of the way numerical
+        % reconstructions occur and will be fixed later
+        coords(:,3) = maxes(3) - coords(:,3);
+        
         scatter3(coords(:,1), coords(:,2), coords(:,3), 5, coords(:,4),'*')
         hold on; axis equal;
         drawnow
