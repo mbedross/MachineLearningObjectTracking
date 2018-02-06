@@ -1,4 +1,4 @@
-function createPlot(points, adjacencyTracks, times)
+function saveTracksXLSX(points, adjacencyTracks, times, fileName)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -40,13 +40,6 @@ for i = 1 : nTracks
                 end
             end
         end
-        scatter3(coords(:,1), coords(:,2), coords(:,3), 5, coords(:,4),'*')
-        hold on; axis equal;
-        drawnow
+        xlswrite(fileName,coords,i)
     end
 end
-h = colorbar;
-xlabel('Distance [\mum]')
-ylabel('Distance [\mum]')
-zlabel('Distance [\mum]')
-ylabel(h, 'Time [s]')

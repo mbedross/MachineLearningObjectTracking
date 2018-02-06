@@ -211,8 +211,11 @@ if track == 1
     % Save final Track Results
     trackResultsDir = fullfile(masterDir,'Tracking Results');
     mkdir(trackResultsDir);
-    trackResultsFile = fullfile(trackResultsDir,'tracks.mat');
-    save(trackResultsFile, '-regexp', '^(?!(X)$).')
+    trackResultsFile = fullfile(trackResultsDir,'tracks');
+    trackResultsFileMAT = strcat(trackResultsFile,'.mat');
+    trackResultsFileXLS = strcat(trackResultsFile, '.xlsx');
+    save(trackResultsFileMAT, '-regexp', '^(?!(X)$).')
+    saveTracksXLSX(pointsNEW, adjacency_tracks, times, trackResultsFileXLS)
     
     % Delete temporary track file
     delete(trackData)
