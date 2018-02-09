@@ -1,4 +1,4 @@
-function [times, zSorted] = preProcessingMain(masterDir)
+function [times, zSorted] = preProcessingMain(innerRadius, outerRadius, centerX, centerY)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -7,14 +7,11 @@ function [times, zSorted] = preProcessingMain(masterDir)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+global n type masterDir
 meanDir = fullfile(masterDir, 'MeanStack');
 mkdir(meanDir);
-global n type
 
-innerRadius = 30;
-outerRadius = 230;
-centerX = n(1)/2;
-centerY = n(2)/2;
 mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
 
 % First, look through the master directory for duplicate holograms

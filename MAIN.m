@@ -202,9 +202,9 @@ if track == 1
             tempPoints(:,3) = (zB-1).*zStepsPerBatch+tempPoints(:,3);
             pointz = [pointz; tempPoints];
         end
-        save(trackData, '-regexp', '^(?!(X)$).') % Save temporary workspace
         points{t} = pointz;
         points2{t} = points{t}*[360/n(1) 0 0;0 360/n(2) 0;0 0 z_separation];
+        save(trackData, '-regexp', '^(?!(X)$).') % Save temporary workspace
     end
     pointsNEW = formatPoints(points2);
     [tracks, adjacency_tracks] = simpletracker(pointsNEW, ...
