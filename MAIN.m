@@ -101,6 +101,11 @@ global n
 zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(1))));
 n = getImageSize(time, zSorted);
 
+centerx = n(1)/2;
+centery = n(2)/2;
+innerRadius = 30;
+outerRadius = 230;
+
 %% Main section
 % Add the preprocess and training subdolders to MATLAB search path, and run
 % the respective functions if applicable
@@ -109,9 +114,9 @@ if preProcess == 1
     addpath('.\preProcessingGPU');
     switch GPU
         case 'Yes'
-            [times, zSorted] = preProcessingGPU(masterDir);
+            [times, zSorted] = preProcessingGPU(innerRadius, outerRadius, centerx, centery);
         case 'No'
-            [times, zSorted] = preProcessingMain(masterDir);
+            [times, zSorted] = preProcessingMain(innerRadius, outerRadius, centerx, centery);
     end
 end
 if train == 1
