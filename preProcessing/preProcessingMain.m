@@ -28,7 +28,7 @@ for i = 1 : length(type)
         Ntimes = length(timePath(not([timePath.isdir])));
         times = 0:Ntimes-1;
         % remove duplicate from times
-        times(ismember(times, dupes)) = [];
+        times(dupes) = [];
         % Ntimes is the number of times in the reconstruction slice
         I = zeros(n(1), n(2), length(times));
         for t = 1 : length(times)-1
