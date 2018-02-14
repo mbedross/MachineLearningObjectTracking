@@ -8,15 +8,16 @@ function [times, zSorted] = preProcessingMain(innerRadius, outerRadius, centerX,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-global n type masterDir
+global n type masterDir batchSize
+N = n;
 meanDir = fullfile(masterDir, 'MeanStack');
 mkdir(meanDir);
 
 switch GPU
     case 'Yes'
-        mask = makeMaskGPU(n, innerRadius, outerRadius, centerX, centerY);
+        mask = makeMaskGPU(N, innerRadius, outerRadius, centerX, centerY);
     case 'No'
-        mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
+        mask = makeMask(N, innerRadius, outerRadius, centerX, centerY);
 end
 
 % First, look through the master directory for duplicate holograms
@@ -31,18 +32,59 @@ for i = 1 : length(type)
         reconPath = fullfile(masterDir, 'Stack', char(type(i)), sprintf('%0.2f', zSorted(j)));
         timePath = dir(reconPath);
         Ntimes = length(timePath(not([timePath.isdir])));
+        % Ntimes is the number of times in the reconstruction slice
         times = 0:Ntimes-1;
         % remove duplicate from times
         times(dupes) = [];
-        % Ntimes is the number of times in the reconstruction slice
+        % Calculate the number of batches to be processed
+        batches = floor(length(times)/(batchSize));
         switch GPU
             case 'Yes'
-                I = gpuArray(zeros(n(1), n(2), length(times)));
+                if batches==0
+                    I = gpuArray(zeros(N(1), N(2), length(times)));
+                else
+                    I = gpuArray(zeros(N(1), N(2), batchSize));
+                end
             case 'No'
-                I = zeros(n(1), n(2), length(times));
+                if batches==0
+                    I = zeros(N(1), N(2), length(times));
+                else
+                    I = zeros(N(1), N(2), batchSize);
+                end  
         end
-        for t = 1 : length(times)-1
-            I(:, :, t) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(t+1))));
+        for k = 0 : batches - 1
+            for ii = 1 : batchSize
+                I(:, :, ii) = imread(fullfile(reconPath, sprintf('%05d.tiff', k*batchSize+ii-1)));
+            end
+            I_mean = meanSubtraction(I);
+            dataDir = fullfile(meanDir, char(type(i)), sprintf('%0.2f', zSorted(j)));
+            mkdir(dataDir);
+            % Now save the mean subtracted images
+            switch GPU
+                case 'Yes'
+                    parfor kk = 1 : size(I_mean, 3)
+                        I_temp = freqFilterGPU(I_mean(:,:,kk).*255, mask, centerX, centerY, N);
+                        I_temp = gather(I_temp);
+                        imwrite(I_temp, fullfile(dataDir, sprintf('%05d.tiff', times(kk))))
+                    end
+                case 'No'
+                    parfor kk = 1 : size(I_mean, 3)
+                        I_temp = freqFilter(I_mean(:,:,kk).*255, mask, centerX, centerY, N);
+                        I_mean(:,:,kk) = I_temp;
+                        imwrite(I_mean(:,:,kk), fullfile(dataDir, sprintf('%05d.tiff', times(kk))))
+                    end
+            end
+        end
+        
+        % Process remaining files
+        switch GPU
+            case 'Yes'
+                I = gpuArray(zeros(N(1), N(2), length(times)-batches*batchSize));
+            case 'No'
+                I = zeros(N(1), N(2), length(times)-batches*batchSize);
+        end
+        for jj = 1 : (length(times)-batches*fps*t)
+            I(:, :, jj) = imread(fullfile(reconPath, sprintf('%05d.tiff', batches*batchSize+jj-1)));
         end
         I_mean = meanSubtraction(I);
         dataDir = fullfile(meanDir, char(type(i)), sprintf('%0.2f', zSorted(j)));
@@ -50,16 +92,16 @@ for i = 1 : length(type)
         % Now save the mean subtracted images
         switch GPU
             case 'Yes'
-                for k = 1 : size(I_mean, 3)
-                    I_temp = freqFilterGPU(I_mean(:,:,k).*255, mask, centerX, centerY, n);
+                parfor kk = 1 : size(I,3)
+                    I_temp = freqFilterGPU(I_mean(:,:,kk).*255, mask, centerX, centerY, N);
                     I_temp = gather(I_temp);
-                    imwrite(I_temp, fullfile(dataDir, sprintf('%05d.tiff', times(k))))
+                    imwrite(I_temp, fullfile(dataDir, sprintf('%05d.tiff', times(kk))))
                 end
             case 'No'
-                for k = 1 : size(I_mean, 3)
-                    I_temp = freqFilter(I_mean(:,:,k).*255, mask, centerX, centerY, n);
-                    I_mean(:,:,k) = I_temp;
-                    imwrite(I_mean(:,:,k), fullfile(dataDir, sprintf('%05d.tiff', times(k))))
+                parfor kk = 1 : size(I,3)
+                    I_temp = freqFilter(I_mean(:,:,kk).*255, mask, centerX, centerY, N);
+                    I_mean(:,:,kk) = I_temp;
+                    imwrite(I_mean(:,:,kk), fullfile(dataDir, sprintf('%05d.tiff', times(kk))))
                 end
         end
     end

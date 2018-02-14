@@ -57,12 +57,13 @@ function MAIN
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ask user for inputs
-
+global batchSize
 % These next few lines will be replaced by a GUI soon!
 zRange = [-13, 7];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
 tRange = [1, 566];  % This is the time range you would like to track
 time = 130;   % This is the time point that you would like to train
+batchSize = 30;
 
 addpath('.\GUI')
 global type
