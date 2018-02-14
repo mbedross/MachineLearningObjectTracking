@@ -18,6 +18,10 @@ nTracks = size(adjacencyTracks,1);
 clear timeOfDay Date stamp
 time = time./1000;                              % Convert time from ms to s
 
+if times(1) == 0
+    times(1) = [];
+end
+
 ImgTimes = time(times);
 ii = 1;
 for i = 1 : nTracks

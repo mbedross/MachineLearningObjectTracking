@@ -61,8 +61,8 @@ function MAIN
 % These next few lines will be replaced by a GUI soon!
 zRange = [-13, 7];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
-tRange = [1, 199];  % This is the time range you would like to track
-time = tRange(1);   % This is the time point that you would like to train
+tRange = [1, 566];  % This is the time range you would like to track
+time = 130;   % This is the time point that you would like to train
 
 addpath('.\GUI')
 global type
@@ -217,7 +217,7 @@ if track == 1
         'MaxGapClosing', max_gap_closing);
     
     % Calculate average swimming speeds
-    [velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);
+    %[velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);
     
     % Save final Track Results
     trackResultsDir = fullfile(masterDir,'Tracking Results');
