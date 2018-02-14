@@ -1,4 +1,4 @@
-function [times, zSorted] = preProcessingMain(innerRadius, outerRadius, centerX, centerY)
+function [times, zSorted] = preProcessingMain(innerRadius, outerRadius, centerX, centerY, GPU)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -12,7 +12,12 @@ global n type masterDir
 meanDir = fullfile(masterDir, 'MeanStack');
 mkdir(meanDir);
 
-mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
+switch GPU
+    case 'Yes'
+        mask = makeMaskGPU(n, innerRadius, outerRadius, centerX, centerY);
+    case 'No'
+        mask = makeMask(n, innerRadius, outerRadius, centerX, centerY);
+end
 
 % First, look through the master directory for duplicate holograms
 [dupes] = findDuplicates(masterDir);
@@ -30,7 +35,12 @@ for i = 1 : length(type)
         % remove duplicate from times
         times(dupes) = [];
         % Ntimes is the number of times in the reconstruction slice
-        I = zeros(n(1), n(2), length(times));
+        switch GPU
+            case 'Yes'
+                I = gpuArray(zeros(n(1), n(2), length(times)));
+            case 'No'
+                I = zeros(n(1), n(2), length(times));
+        end
         for t = 1 : length(times)-1
             I(:, :, t) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(t+1))));
         end
@@ -38,10 +48,19 @@ for i = 1 : length(type)
         dataDir = fullfile(meanDir, char(type(i)), sprintf('%0.2f', zSorted(j)));
         mkdir(dataDir);
         % Now save the mean subtracted images
-        for k = 1 : size(I_mean, 3)
-            I_temp = freqFilter(I_mean(:,:,k).*255, mask, centerX, centerY, n);
-            I_mean(:,:,k) = I_temp;
-            imwrite(I_mean(:,:,k), fullfile(dataDir, sprintf('%05d.tiff', times(k))))
+        switch GPU
+            case 'Yes'
+                for k = 1 : size(I_mean, 3)
+                    I_temp = freqFilterGPU(I_mean(:,:,k).*255, mask, centerX, centerY, n);
+                    I_temp = gather(I_temp);
+                    imwrite(I_temp, fullfile(dataDir, sprintf('%05d.tiff', times(k))))
+                end
+            case 'No'
+                for k = 1 : size(I_mean, 3)
+                    I_temp = freqFilter(I_mean(:,:,k).*255, mask, centerX, centerY, n);
+                    I_mean(:,:,k) = I_temp;
+                    imwrite(I_mean(:,:,k), fullfile(dataDir, sprintf('%05d.tiff', times(k))))
+                end
         end
     end
 end

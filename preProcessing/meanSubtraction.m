@@ -41,6 +41,17 @@ switch x
             I_int(I_int>255) = 255;
             I(:,:,t) = I_int;
         end
+    case 'gpuArray'
+        for t = 1 : t
+            I(:,:,t) = I(:,:,t) - Mean;
+            % Normalize images to prevent flaring
+            I_int = I(:,:,t);
+            I_int= (I_int-min(I_int(:)))./(max(I_int(:))-min(I_int(:)));
+            I_int = I_int+(0.5-mean(I_int(:)));
+            I_int(I_int<0) = 0;
+            I_int(I_int>1) = 1;
+            I(:,:,t) = I_int;
+        end  
 end
 
 I_mean = I;

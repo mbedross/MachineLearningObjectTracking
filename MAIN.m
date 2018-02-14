@@ -111,13 +111,7 @@ outerRadius = 230;
 % the respective functions if applicable
 if preProcess == 1
     addpath('.\preProcessing');
-    addpath('.\preProcessingGPU');
-    switch GPU
-        case 'Yes'
-            [times, zSorted] = preProcessingGPU(innerRadius, outerRadius, centerx, centery);
-        case 'No'
-            [times, zSorted] = preProcessingMain(innerRadius, outerRadius, centerx, centery);
-    end
+    [times, zSorted] = preProcessingMain(innerRadius, outerRadius, centerx, centery, GPU);
 end
 if train == 1
     addpath('.\training');
@@ -217,7 +211,7 @@ if track == 1
         'MaxGapClosing', max_gap_closing);
     
     % Calculate average swimming speeds
-    %[velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);
+    [velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);
     
     % Save final Track Results
     trackResultsDir = fullfile(masterDir,'Tracking Results');
