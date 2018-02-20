@@ -8,9 +8,9 @@ function [times, zSorted] = preProcessingMain(innerRadius, outerRadius, centerX,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
 % Turn duplicate directory warning off
-w = warning('query','last');
-id = w.identifier;
-warning('off',id)
+%w = warning('query','last');
+%id = w.identifier;
+%warning('off',id)
 
 global n type masterDir batchSize
 N = n;

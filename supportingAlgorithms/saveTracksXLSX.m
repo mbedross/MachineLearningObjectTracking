@@ -26,7 +26,7 @@ ImgTimes = time(times);
 ii = 1;
 for i = 1 : nTracks
     index = adjacencyTracks{i,1};
-    if length(index)>=6
+    if length(index)>=20
         coords = allPoints(index,:);
         % Find the times associated to each coordinate
         for j = 1 : length(coords)

@@ -62,7 +62,7 @@ global batchSize
 zRange = [-13, 7];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
 tRange = [1, 566];  % This is the time range you would like to track
-time = 130;   % This is the time point that you would like to train
+time = 1;   % This is the time point that you would like to train
 batchSize = 30;
 
 addpath('.\GUI')
@@ -207,9 +207,10 @@ if track == 1
         save(trackData, '-regexp', '^(?!(X)$).') % Save temporary workspace
     end
     pointsNEW = formatPoints(points2);
-    [tracks, adjacency_tracks] = simpletracker(pointsNEW, ...
-        'MaxLinkingDistance', max_linking_distance, ...
-        'MaxGapClosing', max_gap_closing);
+    % [tracks, adjacency_tracks] = simpletracker(pointsNEW, ...
+    %    'MaxLinkingDistance', max_linking_distance, ...
+    %    'MaxGapClosing', max_gap_closing);
+    [tracks, adjacency_tracks] = simpletracker(pointsNEW);
     
     % Calculate average swimming speeds
     [velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);
