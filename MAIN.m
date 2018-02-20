@@ -57,13 +57,14 @@ function MAIN
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ask user for inputs
-global batchSize
+global batchSize minTrackSize
 % These next few lines will be replaced by a GUI soon!
 zRange = [-13, 7];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
 tRange = [1, 566];  % This is the time range you would like to track
 time = 1;   % This is the time point that you would like to train
-batchSize = 30;
+batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
+minTrackSize = 20; % The minumum length of a track in order to be recorded
 
 addpath('.\GUI')
 global type
