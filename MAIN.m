@@ -62,7 +62,7 @@ global batchSize minTrackSize
 zRange = [-13, 7];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
 tRange = [1, 566];  % This is the time range you would like to track
-time = 1;   % This is the time point that you would like to train
+time = 0;   % This is the time point that you would like to train
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
 
@@ -105,7 +105,7 @@ n = getImageSize(time, zSorted);
 
 centerx = n(1)/2;
 centery = n(2)/2;
-innerRadius = 30;
+innerRadius = 23;
 outerRadius = 230;
 
 %% Main section
