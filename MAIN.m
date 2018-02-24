@@ -65,6 +65,7 @@ tRange = [1, 566];  % This is the time range you would like to track
 time = 0;   % This is the time point that you would like to train
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
+threshold = 100; % This is the maximum distance used in hierarchical clustering (distance is units of pixels)
 
 addpath('.\GUI')
 global type
@@ -201,7 +202,11 @@ if track == 1
             D_C = classify(y, pCutoff, minCluster, n(1),n(2),zStepsPerBatch);
             tempPoints = findCentroids(D_C);
             tempPoints(:,3) = (zB-1).*zStepsPerBatch+tempPoints(:,3);
-            pointz = [pointz; tempPoints];
+            % Use an Agglomerative hierarchical cluster tree to consolidate
+            % duplicate points
+            [Clusters] = hierarchicalClustering(points, threshold);
+            clusterPoints = findClusterCentroids(Clusters, tempPoints);
+            pointz = [pointz; clusterPoints];
         end
         points{t} = pointz;
         points2{t} = points{t}*[360/n(1) 0 0;0 360/n(2) 0;0 0 z_separation];
