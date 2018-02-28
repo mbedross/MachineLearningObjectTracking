@@ -15,19 +15,19 @@ function [Clusters] = hierarchicalClustering(points, threshold)
 Y = pdist(points);
 Z = linkage(Y);
 % Filter out all clusters that are too far apart (> threshold)
-for i = length(Z): -1 : 1
+for i = size(Z,1): -1 : 1
     if Z(i,3) > threshold
         Z(i,:) = [];
     end
 end
 
 % create cluter cell array
-for i = 1 : length(points)
+for i = 1 : size(points,1)
     clusters{i} = i;
 end
 
-for i = 1 : length(Z)
-    clusters{length(points)+i} = [clusters{Z(i,1)} clusters{Z(i,2)}];
+for i = 1 : size(Z,1)
+     clusters{length(points)+i} = [clusters{Z(i,1)} clusters{Z(i,2)}];
 end
 
 aggregate = clusters{length(clusters)};

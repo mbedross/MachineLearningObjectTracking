@@ -101,7 +101,7 @@ addpath('.\preProcessing');
 
 % Define global variables
 global n
-zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(1))));
+zSorted = zSteps(fullfile(masterDir, 'MeanStack', char(type(1))));
 n = getImageSize(time, zSorted);
 
 centerx = n(1)/2;
@@ -143,6 +143,7 @@ if track == 1
         clear t
     else
         latestTime = 1;
+        pointz = zeros(0,3);
     end
     
     % Create Image Datastore of entire XYZt stack
@@ -162,7 +163,6 @@ if track == 1
     numT = length(timesRange);
     tNF = length(times);
     
-    pointz = zeros(0,3);
     X = zeros(n(1)*n(2)*zStepsPerBatch,9);
     inputSlice = zeros(n(1), n(1), 5);
     for t = latestTime : numT
@@ -204,7 +204,7 @@ if track == 1
             tempPoints(:,3) = (zB-1).*zStepsPerBatch+tempPoints(:,3);
             % Use an Agglomerative hierarchical cluster tree to consolidate
             % duplicate points
-            [Clusters] = hierarchicalClustering(points, threshold);
+            [Clusters] = hierarchicalClustering(tempPoints, threshold);
             clusterPoints = findClusterCentroids(Clusters, tempPoints);
             pointz = [pointz; clusterPoints];
         end

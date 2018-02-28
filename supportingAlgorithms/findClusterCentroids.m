@@ -11,8 +11,8 @@ function [centroids] = findClusterCentroids(Clusters, points)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 centroids = zeros(length(Clusters),3);
-for i = 1 : length(centroids)
-    index = Clusters{i,1};
+for i = 1 : size(centroids,1)
+    index = Clusters{1,i};
     coords = points(index,:);
-    centroids(i,:) = mean(coords);
+    centroids(i,:) = mean(coords,1);
 end
