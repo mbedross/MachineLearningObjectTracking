@@ -88,7 +88,7 @@ masterDir = uigetdir('Choose Data Parent Directory');
 
 % Define tracking parameters
 max_linking_distance = 30;
-max_gap_closing = 1;
+max_gap_closing = 3;
 
 % Define image parameters
 pCutoff = 0.005;
@@ -213,10 +213,10 @@ if track == 1
         save(trackData, '-regexp', '^(?!(X)$).') % Save temporary workspace
     end
     pointsNEW = formatPoints(points2);
-    % [tracks, adjacency_tracks] = simpletracker(pointsNEW, ...
-    %    'MaxLinkingDistance', max_linking_distance, ...
-    %    'MaxGapClosing', max_gap_closing);
-    [tracks, adjacency_tracks] = simpletracker(pointsNEW);
+    [tracks, adjacency_tracks] = simpletracker(pointsNEW, ...
+       'MaxLinkingDistance', max_linking_distance, ...
+       'MaxGapClosing', max_gap_closing);
+    %[tracks, adjacency_tracks] = simpletracker(pointsNEW);
     
     % Calculate average swimming speeds
     [velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);
