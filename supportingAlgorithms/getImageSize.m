@@ -1,4 +1,4 @@
-function n = getImageSize(time, zSorted)
+function n = getImageSize(time)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -7,10 +7,10 @@ function n = getImageSize(time, zSorted)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-global type masterDir
+global masterDir
 
-reconPath = fullfile(masterDir, 'MeanStack', char(type(1)), sprintf('%0.2f', zSorted(1)));
-I = imread(fullfile(reconPath, sprintf('%05d.tiff', time)));
+reconPath = fullfile(masterDir, 'Holograms');
+I = imread(fullfile(reconPath, sprintf('%05d_holo.tif', time)));
 [N, M] = size(I);
 
 if N ~= M

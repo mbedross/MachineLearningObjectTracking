@@ -62,7 +62,7 @@ global batchSize minTrackSize
 zRange = [-13, 7];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
 tRange = [1, 566];  % This is the time range you would like to track
-time = 0;   % This is the time point that you would like to train
+time = 1;   % This is the time point that you would like to train
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
 threshold = 100; % This is the maximum distance used in hierarchical clustering (distance is units of pixels)
@@ -101,8 +101,8 @@ addpath('.\preProcessing');
 
 % Define global variables
 global n
-zSorted = zSteps(fullfile(masterDir, 'MeanStack', char(type(1))));
-n = getImageSize(time, zSorted);
+zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(1))));
+n = getImageSize(time);
 
 centerx = n(1)/2;
 centery = n(2)/2;
@@ -204,9 +204,13 @@ if track == 1
             tempPoints(:,3) = (zB-1).*zStepsPerBatch+tempPoints(:,3);
             % Use an Agglomerative hierarchical cluster tree to consolidate
             % duplicate points
-            [Clusters] = hierarchicalClustering(tempPoints, threshold);
-            clusterPoints = findClusterCentroids(Clusters, tempPoints);
-            pointz = [pointz; clusterPoints];
+            if size(tempPoints,1)>1
+                [Clusters] = hierarchicalClustering(tempPoints, threshold);
+                clusterPoints = findClusterCentroids(Clusters, tempPoints);
+                pointz = [pointz; clusterPoints];
+            else
+                pointz = [pointz; tempPoints];
+            end
         end
         points{t} = pointz;
         points2{t} = points{t}*[360/n(1) 0 0;0 360/n(2) 0;0 0 z_separation];
