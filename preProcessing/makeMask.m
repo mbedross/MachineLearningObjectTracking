@@ -18,3 +18,4 @@ mask((x-centerx).^2 + (y-centery).^2 < innerRadius^2) = 0;
 
 imagesc(mask)
 axis equal; axis([0 2048 0 2048]); colormap gray
+drawnow

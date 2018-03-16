@@ -44,7 +44,8 @@ for i = 1 : nTracks
         % Account for flipped z (this is because of the way numerical
         % reconstructions occur and will be fixed later
         coords(:,3) = maxes(3) - coords(:,3);
-        scatter3(coords(:,1), coords(:,2), coords(:,3), 5, coords(:,4),'*')
+        %scatter3(coords(:,1), coords(:,2), coords(:,3), 5, coords(:,4),'*')
+        scatter3(coords(:,1), coords(:,2), coords(:,3), 5,'*')
         hold on; axis equal; axis([Mins(1) Maxs(1) Mins(2) Maxs(2) Mins(3) Maxs(3)]);
         drawnow
     end
