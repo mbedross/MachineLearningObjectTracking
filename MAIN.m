@@ -62,7 +62,7 @@ global batchSize minTrackSize
 zRange = [-13, 7];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
 tRange = [1, 566];  % This is the time range you would like to track
-time = 1;   % This is the time point that you would like to train
+time = 761;   % This is the time point that you would like to train
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
 threshold = 100; % This is the maximum distance used in hierarchical clustering (distance is units of pixels)
@@ -104,6 +104,10 @@ global n
 zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(1))));
 n = getImageSize(time);
 
+if strcmp(char(type(1)), 'DIC')
+    n = [2048, 2047];
+end
+
 centerx = n(1)/2;
 centery = n(2)/2;
 innerRadius = 23;
@@ -121,7 +125,8 @@ if train == 1
     if preProcess == 0
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
-    trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1]; 
+    %trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
+    trainZrange = [-1.8, -0.8];
     [dTrain]    = import3D(zSorted, time, trainZrange);
     [b, Xtrain] = training(dTrain);
 end
@@ -164,7 +169,7 @@ if track == 1
     tNF = length(times);
     
     X = zeros(n(1)*n(2)*zStepsPerBatch,9);
-    inputSlice = zeros(n(1), n(1), 5);
+    inputSlice = zeros(n(1), n(2), 5);
     for t = latestTime : numT
         for zB = 1 : zBatches
             for zStep = 1 : zStepsPerBatch

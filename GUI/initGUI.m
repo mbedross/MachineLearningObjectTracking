@@ -22,7 +22,7 @@ function varargout = initGUI(varargin)
 
 % Edit the above text to modify the response to help initGUI
 
-% Last Modified by GUIDE v2.5 01-Feb-2018 15:38:33
+% Last Modified by GUIDE v2.5 16-Mar-2018 09:34:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,7 +52,7 @@ function initGUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to initGUI (see VARARGIN)
 global dataType preProcess train track Quit
-dataType = {'', '', ''};
+dataType = {'', '', '', ''};
 Quit = 0;
 preProcess = 0;
 train = 0;
@@ -216,4 +216,19 @@ if isequal(get(hObject, 'waitstatus'), 'waiting')
 else
     % The GUI is no longer waiting, just close it
     delete(hObject);
+end
+
+
+% --- Executes on button press in radiobutton4.
+function radiobutton4_Callback(hObject, eventdata, handles)
+% hObject    handle to radiobutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of radiobutton3
+global dataType
+if get(hObject,'Value') == 1
+    dataType{1,4} = 'DIC';
+else
+    dataType{1,4} = '';
 end

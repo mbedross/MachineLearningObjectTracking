@@ -36,7 +36,7 @@ zSorted(zSorted < zRange(1)) = [];
 zNF = length(zSorted);
 
 % Begin loading images into dTrain
-I = uint8(zeros(n(1), n(1), zNF));
+I = uint8(zeros(n(1), n(2), zNF));
 for i = 1: zNF
     reconPath = fullfile(masterDir, 'MeanStack', char(type), sprintf('%0.2f', zSorted(i)));
     I(:, :, i) = imread(fullfile(reconPath, sprintf('%05d.tiff', time)));
