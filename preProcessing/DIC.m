@@ -11,8 +11,9 @@ function DIC(masterDir)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 poolobj = parpool;
+cropSize = 100;                   % How many pixels to pad around the image
 
-zSorted = zSteps(fullfile(masterDir, 'MeanStack', 'Amplitude'));
+zSorted = zSteps(fullfile(masterDir, 'MeanStack', 'Phase'));
 NFz = length(zSorted);
 
 meanDir = fullfile(masterDir, 'MeanStack','DIC');
@@ -28,13 +29,16 @@ for z = 1 : NFz
     phasePath = fullfile(masterDir, 'MeanStack', 'Phase', sprintf('%0.2f', zSorted(z)));
     dataDir = fullfile(meanDir, sprintf('%0.2f', zSorted(z)));
     mkdir(dataDir);
-    parfor t = 1 : length(times)
+    parfor t = 1 : 250 %length(times)
         I_phase = gpuArray(imread(fullfile(phasePath, sprintf('%05d.tiff', times(t)))));
         I_phase = im2double(I_phase);
         dic = diff(I_phase,1,2);
         
         % Normalize Images
-        dic = (dic-min(dic(:)))./(max(dic(:))-min(dic(:)));
+        cropped = dic(cropSize : end-cropSize, cropSize : end-cropSize);
+        minDIC = min(cropped(:));
+        maxDIC = max(cropped(:));
+        dic = (dic-minDIC)./(maxDIC-minDIC);
         dic = dic+(0.5-mean(dic(:)));
         dic(dic<0) = 0;
         dic(dic>1) = 1;

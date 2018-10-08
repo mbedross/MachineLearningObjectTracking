@@ -7,7 +7,7 @@ function ampXphase(masterDir)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%poolobj = parpool;
+poolobj = parpool;
 
 zSorted = zSteps(fullfile(masterDir, 'MeanStack', 'Amplitude'));
 NFz = length(zSorted);
@@ -16,9 +16,8 @@ meanDir = fullfile(masterDir, 'MeanStack','ampXphase');
 mkdir(meanDir);
 
 % First, look through the master directory for duplicate holograms
-[dupes] = findDuplicates(masterDir);
 timePath = dir(fullfile(masterDir, 'Holograms'));
-NFt = length(timePath(not([timePath.isdir])));
+[dupes] = findDuplicates(masterDir);
 times = 0:length(dupes)-1;
 % remove duplicate from times
 times(logical(dupes)) = [];

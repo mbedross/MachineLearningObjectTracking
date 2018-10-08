@@ -27,6 +27,9 @@ end
 
 % First, look through the master directory for duplicate holograms
 [dupes] = findDuplicates(masterDir);
+times = 0:length(dupes)-1;
+% remove duplicate from times
+times(logical(dupes)) = [];
 
 % Now median subtract images (without duplicates)
 %type = ["Amplitude", "Phase"];
@@ -38,9 +41,6 @@ for i = 1 : length(type)
         % timePath = dir(reconPath);
         % Ntimes = length(timePath(not([timePath.isdir])));
         % Ntimes is the number of times in the reconstruction slice
-        times = 0:length(dupes)-1;
-        % remove duplicate from times
-        times(logical(dupes)) = [];
         % Calculate the number of batches to be processed
         batches = floor(length(times)/(bSize));
         switch GPU

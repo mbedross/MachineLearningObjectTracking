@@ -1,4 +1,4 @@
-function MAIN
+ function MAIN
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -21,7 +21,7 @@ function MAIN
 % The processed data is stored in the directory 'MeanStack' located in the
 % master directory
 %
-% 2. Training walks the user through a series of GUI's that manually
+% 2. Training walks the user through a series of GUIs that manually
 % identify particles of interest. These selected particles are then used to
 % generate model data that is then used in the tracking section to analyze
 % new data for simialr particles of interest. Training data is saved in a
@@ -59,10 +59,10 @@ function MAIN
 %% Ask user for inputs
 global batchSize minTrackSize
 % These next few lines will be replaced by a GUI soon!
-zRange = [-13, 7];  % This is the zRange you would like to track
+zRange = [-30, -14];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
-tRange = [1, 566];  % This is the time range you would like to track
-time = 761;   % This is the time point that you would like to train
+tRange = [1, 335];  % This is the time range you would like to track
+time = 2;   % This is the time point that you would like to train
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
 threshold = 100; % This is the maximum distance used in hierarchical clustering (distance is units of pixels)
@@ -110,8 +110,8 @@ end
 
 centerx = n(1)/2;
 centery = n(2)/2;
-innerRadius = 23;
-outerRadius = 230;
+innerRadius = 40;
+outerRadius = 310; %310 for common mode
 
 %% Main section
 % Add the preprocess and training subdolders to MATLAB search path, and run
@@ -125,8 +125,8 @@ if train == 1
     if preProcess == 0
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
-    %trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
-    trainZrange = [-1.8, -0.8];
+    trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
+    %trainZrange = [-25, -24];
     [dTrain]    = import3D(zSorted, time, trainZrange);
     [b, Xtrain] = training(dTrain);
 end
@@ -228,7 +228,7 @@ if track == 1
     %[tracks, adjacency_tracks] = simpletracker(pointsNEW);
     
     % Calculate average swimming speeds
-    [velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);
+    %[velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);
     
     % Save final Track Results
     trackResultsDir = fullfile(masterDir,'Tracking Results');
