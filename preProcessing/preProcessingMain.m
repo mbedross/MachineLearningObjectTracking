@@ -7,10 +7,6 @@ function [times, zSorted] = preProcessingMain(innerRadius, outerRadius, centerX,
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 tic
-% Turn duplicate directory warning off
-%w = warning('query','last');
-%id = w.identifier;
-%warning('off',id)
 
 global n type masterDir batchSize
 N = n;
@@ -38,9 +34,8 @@ for i = 1 : length(type)
     NF = length(zSorted);
     for j = 1 : NF
         reconPath = fullfile(masterDir, 'Stack', char(type(i)), sprintf('%0.2f', zSorted(j)));
-        % timePath = dir(reconPath);
-        % Ntimes = length(timePath(not([timePath.isdir])));
-        % Ntimes is the number of times in the reconstruction slice
+        dataDir = fullfile(meanDir, char(type(i)), sprintf('%0.2f', zSorted(j)));
+        mkdir(dataDir);
         % Calculate the number of batches to be processed
         batches = floor(length(times)/(bSize));
         switch GPU
@@ -62,8 +57,7 @@ for i = 1 : length(type)
                 I(:, :, ii) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(k*bSize+ii))));
             end
             I_mean = meanSubtraction(I);
-            dataDir = fullfile(meanDir, char(type(i)), sprintf('%0.2f', zSorted(j)));
-            mkdir(dataDir);
+            
             % Now save the mean subtracted images
             switch GPU
                 case 'Yes'
@@ -92,8 +86,6 @@ for i = 1 : length(type)
             I(:, :, jj) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(batches*bSize+jj))));
         end
         I_mean = meanSubtraction(I);
-        dataDir = fullfile(meanDir, char(type(i)), sprintf('%0.2f', zSorted(j)));
-        mkdir(dataDir);
         % Now save the mean subtracted images
         switch GPU
             case 'Yes'

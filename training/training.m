@@ -1,11 +1,11 @@
-function [b, Xtrain] = training(dTrain)
+function [b, Xtrain] = training(dTrain, trainZrange)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% This function represents Stage 1 of the training routine for ML based
-% particle tracking
+% This function contains the training routine for ML based particle
+% tracking
 %
-% This function assumes that the zSteps sub routine is already been run and
+% This function assumes that the zSteps sub routine has already been run and
 % its results are passed to it
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -13,7 +13,7 @@ function [b, Xtrain] = training(dTrain)
 global masterDir
 
 % First import mean subtracted and filtered reconstructions into a four
-% dimensional matrix dTrain = XxYxZxt
+% dimensional matrix dTrain = [X by Y by Z by t]
 addpath('./supportingAlgorithms');
 cropSize = 15;
 

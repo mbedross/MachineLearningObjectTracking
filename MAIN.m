@@ -128,7 +128,7 @@ if train == 1
     trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
     %trainZrange = [-25, -24];
     [dTrain]    = import3D(zSorted, time, trainZrange);
-    [b, Xtrain] = training(dTrain);
+    [b, Xtrain] = training(dTrain, trainZrange);
 end
 if track == 1
     % If the dataset is already trained, load the model variables
