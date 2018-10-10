@@ -118,7 +118,11 @@ outerRadius = 310; %310 for common mode
 % the respective functions if applicable
 if preProcess == 1
     addpath('.\preProcessing');
-    [times, zSorted] = preProcessingMain(innerRadius, outerRadius, centerx, centery, GPU);
+    if strcmp(GPU, 'Yes')
+        [times, zSorted] = preProcessingGPU(innerRadius, outerRadius, centerx, centery, GPU);
+    else
+        [times, zSorted] = preProcessing(innerRadius, outerRadius, centerx, centery, GPU);
+    end
 end
 if train == 1
     addpath('.\training');
