@@ -62,7 +62,9 @@ global batchSize minTrackSize
 zRange = [-30, -14];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
 tRange = [1, 335];  % This is the time range you would like to track
-time = 2;   % This is the time point that you would like to train
+trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
+%trainZrange = [-25, -24];
+trainTrange = [1, 10];
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
 threshold = 100; % This is the maximum distance used in hierarchical clustering (distance is units of pixels)
@@ -129,10 +131,7 @@ if train == 1
     if preProcess == 0
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
-    trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
-    %trainZrange = [-25, -24];
-    [dTrain]    = import3D(zSorted, time, trainZrange);
-    [b, Xtrain] = training(dTrain, trainZrange);
+    [b, Xtrain] = training(trainZrange, trainTrange);
 end
 if track == 1
     % If the dataset is already trained, load the model variables
@@ -156,7 +155,7 @@ if track == 1
     end
     
     % Create Image Datastore of entire XYZt stack
-    [ds] = import4D(zSorted, zRange);
+    [ds, zNF] = import4D(zSorted, zRange);
     
     zRangeSorted = zSorted;
     zRangeSorted(zSorted > zRange(2)) = [];

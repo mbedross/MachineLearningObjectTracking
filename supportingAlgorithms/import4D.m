@@ -1,4 +1,4 @@
-function [ds] = import4D(zSorted, zRange)
+function [ds, zNF] = import4D(zSorted, zRange)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -41,3 +41,4 @@ for z = 1 : zNF
 end
 
 ds = datastore(location, 'IncludeSubfolders', true,'FileExtensions', '.tiff','Type', 'image');
+
