@@ -57,7 +57,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ask user for inputs
-global batchSize minTrackSize
+global batchSize minTrackSize particleSize
 % These next few lines will be replaced by a GUI soon!
 zRange = [-30, -14];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
@@ -65,6 +65,7 @@ tRange = [1, 335];  % This is the time range you would like to track
 trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
 %trainZrange = [-25, -24];
 trainTrange = [1, 10];
+particleSize = 30; % Approximate size of the particle in pixels
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
 threshold = 100; % This is the maximum distance used in hierarchical clustering (distance is units of pixels)

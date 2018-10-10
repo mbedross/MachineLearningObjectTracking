@@ -12,11 +12,6 @@ function [b, Xtrain] = training(trainZrange, trainTrange)
 
 global masterDir
 
-% First import mean subtracted and filtered reconstructions into an iamge
-% datastore (ds)
-addpath('./supportingAlgorithms');
-load(fullfile(masterDir, 'MeanStack','metaData.mat'))
-[ds, zNF] = import4D(zSorted, trainZrange);
 cropSize = 15;
 
 [trainFileName, trainPath] = uiputfile('*.mat','Choose Where to Save Training Data file');
@@ -26,7 +21,18 @@ coordName = fullfile(masterDir, 'BugCoords.mat');
 if exist(coordName, 'file') == 2
     load(coordName);
 else
-    bugCoords = getBugCoords(dTrain, 1);
+    trainLock = 1;
+    numParticle = 0;
+    while trainLock
+        tempCoords = getParticleCoordsXY(trainZrange, trainTrange);
+        tempCoords = getParticleCoordsZ(particleCoords);
+        numParticle = numParticle + 1;
+        particleCoords{numParticle, :} = [tempCoords];
+        track = questdlg('Would you like to track another particle?', 'Yes','No','Yes');
+        if strcmp(track, 'No')
+            trainLock = 0;
+        end
+    end
     save(coordName, 'bugCoords')
 end
 croppedDt = cropEdges(dTrain, cropSize);
