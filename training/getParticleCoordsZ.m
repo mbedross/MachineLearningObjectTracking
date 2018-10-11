@@ -74,6 +74,7 @@ for t = 1 : length(trainTrange)
 	h1 = figure(1)
 	imshow(xzSlice, [], 'XData', [0 1], 'YData', [0 15]);
 	title('Select the point at which the particle is in focus (the waist of the PSF). Press ENTER when done.')
-	[x,z] = getpts;
+	[X,Y] = getpts;
+    x = mean(X); y = mean(Y);
 	particleCoords(t,3) = zSortedRange(z);
 end

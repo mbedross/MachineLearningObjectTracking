@@ -53,7 +53,8 @@ for i = 1 : length(trainTrange)
     else
         title(sprintf('Please select the same particle you wish to track. %f z-plane is shown. Press ENTER when youve selected the single particle', zCenter))
     end
-    [x,y] = getpts;
+    [X,Y] = getpts;
+    x = mean(X); y = mean(Y);
     particleCoords(i,:) = [x, y, zCenter, dsIndex+i];
 end
 close(h1)
