@@ -2,6 +2,9 @@ function [particleCoords] = getParticleCoordsXY(trainZrange, trainTrange)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% Author: Manuel Bedrossian, Caltech
+% Date Created: 2018.10.10
+%
 % This function is intended to display a sequence of images to a user who
 % is to select particles of interest in order the Machine Learning Algorithm
 % to be trained.
@@ -24,6 +27,9 @@ function [particleCoords] = getParticleCoordsXY(trainZrange, trainTrange)
 % The user will then be asked if they wish to select a new particle. A total
 % three particles is required to generate a statisitically significant
 % amount of training data.
+%
+% For a detailed list and description of variables please see the read me
+% file 'README.md'
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

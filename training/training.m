@@ -2,11 +2,33 @@ function [b, Xtrain] = training(trainZrange, trainTrange)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% Author: Manuel Bedrossian, Caltech
+% Date Created: 2018.10.10
+%
 % This function contains the training routine for ML based particle
 % tracking
 %
-% This function assumes that the zSteps sub routine has already been run and
-% its results are passed to it
+% The workflow of this routine is as follows:
+% 1. The user is presented with a windows dialog box and asked to specify
+%    a file location where they would like to save the training data.
+% 2. The code checks the data directory to see if any particle coordinates
+%    exist there. 
+% 3. If particle coordinates exist for the data set that is
+%    to be trained, they are loaded to RAM.
+% 4. If particle coordinates do not exist, the code then beings the
+%    training process by presenting data to the user and asking for particle
+%    locations. Refer to getParticleCoordsXY() and getParticleCoordsZ() for
+%    more information.
+% 5. With particle coordinates for this data set. The code then generates
+%    input matrices that will be used to generate predicative models.
+% 6. The code then uses these input matrices to calculate models that it
+%    can then use to detect similiar particles in unanalyzed data
+% 7. The model data is then returned back to the calling function as a
+%    list of coefficients and the input matrix used to generate those co-
+%    efficients. 
+% 
+% For a detailed list and description of variables please see the read me
+% file 'README.md'
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -25,7 +47,7 @@ else
     numParticle = 0;
     while trainLock
         tempCoords = getParticleCoordsXY(trainZrange, trainTrange);
-        tempCoords = getParticleCoordsZ(particleCoords);
+        tempCoords = getParticleCoordsZ(tempCoords, trainZrange, trainTrange)
         numParticle = numParticle + 1;
         particleCoords{numParticle, :} = [tempCoords];
         track = questdlg('Would you like to track another particle?', 'Yes','No','Yes');
@@ -35,6 +57,9 @@ else
     end
     save(coordName, 'bugCoords')
 end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 croppedDt = cropEdges(dTrain, cropSize);
 dTrain = addEdges(croppedDt, cropSize);
 

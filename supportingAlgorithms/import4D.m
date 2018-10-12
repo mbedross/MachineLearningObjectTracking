@@ -2,10 +2,11 @@ function [ds, zNF] = import4D(zSorted, zRange)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% Author: Manuel Bedrossian, Caltech
+% Date Created: 2018.10.10
+%
 % This function imports z-slice reconstructions at a multiple time points 
-% as a four-dimensional matrix I. Where size(I) = x by y by z by t. 'x' 
-% and 'y' are the width and height of the image, respectively, 'z' is the z
-% step, and 't' is time.
+% as an image datastore. 
 %
 % Variable list:
 % dataDir = (input) string of the filepath where data is located
@@ -26,6 +27,9 @@ function [ds, zNF] = import4D(zSorted, zRange)
 %             z-slice to be imported
 %
 % I = (output) the final variable containing the three-dimensional z-stack
+%
+% For a detailed list and description of variables please see the read me
+% file 'README.md'
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

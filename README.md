@@ -110,3 +110,76 @@ If pre-processing is chosen, the code will begin to run and no further user inte
 If training is chosen, a dialog box will open asking the user to select where to save the training data once generated. Next, an image will appear and the user will be prompted to begin selecting all in focus particles. The plot that is presented allows the user to hover the curser over a particle and click on it. The pixel location of the click is recorded. To undo the previous click press BACKSPACE. Once all in focus particles are selected pressing ENTER or RETURN will present the next z slice. After all 10 z slices are presented, the image window will close and the machine learning module will begin generating a model of the data. It will automatically store it where ever told by the user.
 
 If tracking is selected IN ADDITION to training being chosen, the program will begin tracking as soon as the training algorithm has concluded. If tracking is chosen WITHOUT training, a dialog box will appear asking the user to point to the training data that is to be used to track the dataset. Once this has happened, the tracking algorithm will begin running and no further user interaction is needed.
+
+## Variable List
+
+Variable lists are organized by the routine they originate from and in alphabetical order.
+
+### MAIN.m
+
+`zRange =` This is the range in the z-direction you would like to track (by folder name)
+
+`z_separation =` This is the physical separation between z-slices (in microns)
+
+`tRange =` This is the range in time you would like to track (in # of frames)
+
+`trainZrange =` The range in the z-direction that you would like to train (in # of frames)
+
+`trainTrange =` The range in time that you would like to train (in # of frames)
+
+`particleSize =` GLOBAL The approximate size of the particle (in pixels)
+
+`batchSize =` GLOBAL The number of reconstructions that are batched together for mean subtraction
+
+`minTrackSize =` GLOBAL The minumum length of a track in order to be recognized as a particle 
+
+`threshold =` 100; % This is the maximum distance used in hierarchical clustering (in pixels)
+
+`preProcess =` Binary variable that is used to decide whether the user wishes to run the Pre-Processing function (0=no, 1=yes)
+
+`train =` Binary variable that is used to decide whether the user wishes to run the training function (0=no, 1=yes)
+
+`track =` Binary variable that is used to decide whether the user wishes to run the tracking function (0=no, 1=yes)
+
+`type =` GLOBAL A character string that contains the type of images that the user wishes to process (e.g. Amplitude, Phase, DIC, etc.)
+
+`Quit =` Binary variable that is used to exit the entire program (0=continue, 1=exit)
+
+`GPU =` A user input whether they want to utilize the GPU during Pre-processing or not ('Yes' or 'No')
+
+`masterDir` = Filepath to the data that is to be analyzed
+
+`max_linking_distance =` The maximum distance (XY) that two points will be linked in time to form a trajectory (in pixels)
+
+`max_gap_closing =` The maximum distance (t) that two points will be linked to close a gap in its trajectory (in # of frames). Position between these gaps will be linearly interpolated
+
+`pCutoff =` The p-value that is used to judge whether a pixel is most-likely a particle or not
+
+`zSorted =` List of all z-slices that are present in the data set
+
+`n =` GLOBAL Size of the images that are to be analyzed (N,M)
+
+`centerx =` The x-direction center that is used for the Fourier Mask in band-pass filtering (in pixels)
+
+`centery =` The y-direction center that is used for the Fourier Mask in band-pass filtering (in pixels)
+
+`innerRadius =` The inner radius size that is used for the Fourier Mask in band-pass filtering (in pixels). This defines the low cut-off frequency
+
+`outerRadius =` The outer radius size that is used for the Fourier Mask in band-pass filtering (in pixels). This defines the upper cut-off frequency
+
+`b =` The coefficients of the linear model generated after training the machine learning algorithm
+
+`Xtrain =` The input matrix used to generate the linear model in `b`
+
+`trainFileName =` If the user chooses to track a data set without tracking first, it is assumed that the user wishes to use a previously trained model. This variable is the filename of that training data
+
+`trainFilePath =` If the user chooses to track a data set without tracking first, it is assumed that the user wishes to use a previously trained model. This variable is the filepath of that training data
+
+`trainDir =` Is `trainFilePath` with `trainFileName` appended to it to define the full file path to the training data
+
+`trackData =` A temperorary file path where tracking progress will be saved iteratively. This preserves progress in the case of a crash. Restarting the tracking algorithm will look for this file first. If it exists, the code will load this and pick up where it left off.
+
+`astestTime =` An index variable specifying the latest time point that data has been tracked
+
+`t =` An index variable specifying the current time point that is being analyzed
+

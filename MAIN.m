@@ -2,6 +2,9 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% Author: Manuel Bedrossian, Caltech
+% Date Created: 2018.10.10
+%
 % This is the main function for the machine learning assisted tracking of
 % off-axis holographic reconstructions.
 %
@@ -54,6 +57,9 @@
 % tRange =  array defining the range in times desired to be
 %           imported (e.g. tRange = [tMin tMax])
 %
+% For a detailed list and description of variables please see the read me
+% file 'README.md'
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ask user for inputs
@@ -105,7 +111,7 @@ addpath('.\preProcessing');
 % Define global variables
 global n
 zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(1))));
-n = getImageSize(time);
+n = getImageSize(trainTrange(1));
 
 if strcmp(char(type(1)), 'DIC')
     n = [2048, 2047];

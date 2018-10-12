@@ -2,6 +2,9 @@ function [particleCoords] = getParticleCoordsZ(xyCoords, trainZrange, trainTrang
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% Author: Manuel Bedrossian, Caltech
+% Date Created: 2018.10.10
+%
 % This function is intended to display a sequence of images to a user who
 % is to select particles of interest in order the Machine Learning Algorithm
 % to be trained.
@@ -27,6 +30,9 @@ function [particleCoords] = getParticleCoordsZ(xyCoords, trainZrange, trainTrang
 %
 % Although this function is meant to perform tracking in z, the input variable
 % contains z values of the approximate z location of the particle
+%
+% For a detailed list and description of variables please see the read me
+% file 'README.md'
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -74,7 +80,7 @@ for t = 1 : length(trainTrange)
 	h1 = figure(1)
 	imshow(xzSlice, [], 'XData', [0 1], 'YData', [0 15]);
 	title('Select the point at which the particle is in focus (the waist of the PSF). Press ENTER when done.')
-	[X,Y] = getpts;
-    x = mean(X); y = mean(Y);
+	[X,Z] = getpts;
+    x = mean(X); y = mean(Z);
 	particleCoords(t,3) = zSortedRange(z);
 end
