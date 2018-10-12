@@ -117,7 +117,7 @@ Variable lists are organized by the routine they originate from and in alphabeti
 
 ### MAIN.m
 
-`zRange =` This is the range in the z-direction you would like to track (by folder name)
+`zRange =` GLOBAL This is the range in the z-direction you would like to track (by folder name)
 
 `z_separation =` This is the physical separation between z-slices (in microns)
 
@@ -147,7 +147,7 @@ Variable lists are organized by the routine they originate from and in alphabeti
 
 `GPU =` A user input whether they want to utilize the GPU during Pre-processing or not ('Yes' or 'No')
 
-`masterDir` = Filepath to the data that is to be analyzed
+`masterDir` = GLOBAL Filepath to the data that is to be analyzed
 
 `max_linking_distance =` The maximum distance (XY) that two points will be linked in time to form a trajectory (in pixels)
 
@@ -182,4 +182,58 @@ Variable lists are organized by the routine they originate from and in alphabeti
 `astestTime =` An index variable specifying the latest time point that data has been tracked
 
 `t =` An index variable specifying the current time point that is being analyzed
+
+### import4D.m
+
+`zRange =` [Defined in MAIN.m] This is the range in the z-direction you would like to track (by folder name)
+
+`zSorted =` [Defined in MAIN.m] List of all z-slices that are present in the data set
+
+`zNF =` The total number of z-slices that are going to be included in the image datastore
+
+`location =` A cell array containing the directories of data (in sequential order) where images are stored that are going to be part of the image datastore
+
+`ds =` The datastore with a collection of data specified by `location`
+
+### training.m
+
+`masterdir =` [Defined in MAIN.m] GLOBAL Filepath to the data that is to be analyzed
+
+`trainFileName =` User defined filename for training data to be saved as
+
+`trainPath =` User defined filepath for saving training data
+
+`coordName =` Filepath and filename of pre-determined particle coordinates. File does not necessariliy exist, there is an if statement that checks for it.
+
+`trainLock =` A lock variable that decides whether to present the user with more data to train or not. This is user defined via dialog box after each training iteration. See training.m header
+
+`numParticle =` An index variable to keep track of how many particles have been tracked for training purposes
+
+`trainZrange =` [Defined in MAIN.m] The range in the z-direction that you would like to train (in # of frames)
+
+`trainTrange =` [Defined in MAIN.m] The range in time that you would like to train (in # of frames)
+
+`tempCoords =` A temporary variable that stores spatial and temporal coordinates of a single particle (nx4 matrix where each column is the xyzt coordinate respectively)
+
+`particleCoords =` A cell array where each cell in the array is the xyzt coordinates of a different particle (same syntax as `tempCoords`)
+
+`track = ` Variable to store response by user whether they wish to continue tracking another particle or not ('Yes' or 'No')
+
+### getParticleCoordsXY.m
+
+`masterdir =` [Defined in MAIN.m] GLOBAL Filepath to the data that is to be analyzed
+
+`ds =` [Defined in import4D.m, instantiated in MAIN.m] GLOBAL The datastore with a collection of data specified by `location`
+
+`zNF` [Defined in import4D, instantiated in MAIN.m] GLOBAL The total number of z-slices that are going to be included in the image datastore
+
+`zRange =` [Defined in MAIN.m] GLOBAL This is the range in the z-direction you would like to track (by folder name)
+
+`zCenter =` The center (rounded down) of the `zRange` interval
+
+`zCenterIdx =` The index of the `zCenter` entry in the array `zSorted`
+
+`times =` An array with the frame numbers of all non-duplicate frames in the data set
+
+`tNF =` The number of non-duplicate frame numbers in the data set (length of `times` array)
 

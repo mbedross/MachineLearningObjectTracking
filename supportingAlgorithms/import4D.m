@@ -6,27 +6,12 @@ function [ds, zNF] = import4D(zSorted, zRange)
 % Date Created: 2018.10.10
 %
 % This function imports z-slice reconstructions at a multiple time points 
-% as an image datastore. 
+% as an image datastore for only the range of z-slices defined in zRange.
 %
-% Variable list:
-% dataDir = (input) string of the filepath where data is located
-% zSorted = (input) array of sorted z-slice locations (all locations)
-% times =   (input) the times at which z-stack exist (all locations)
-% zRange =  (input) array defining the range in z values desired to be
-%                   imported (e.g. zRange = [zMin zMax])
-% tRange =  (input) array defining the range in times desired to be
-%           imported (e.g. tRange = [tMin tMax])
-%
-% type =      a global variable that defines whether to import an Amplitude 
-%             or Phase reconstruction
-% n =         a global variable that defines the x and y pixel counts of 
-%             the z-slices (e.g. n = [2048 2048])
-% zNF =       the total number of z-slices to be imported
-% tNF =       the total number of time points to be imported
-% reconPath = an intermediate variable to define the filepath to a specific
-%             z-slice to be imported
-%
-% I = (output) the final variable containing the three-dimensional z-stack
+% All images are indexed sequentially by batches of z-slice (in ascending 
+% order) and in time. (e.g. If there are a total of 10 z-slices in datastore
+% and twenty time points in each z-slice, accessing the 4th time point in 
+% the 3rd z-slice would require to access the 24th entry in the datastore 
 %
 % For a detailed list and description of variables please see the read me
 % file 'README.md'
