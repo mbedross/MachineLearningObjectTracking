@@ -110,3 +110,18 @@ If pre-processing is chosen, the code will begin to run and no further user inte
 If training is chosen, a dialog box will open asking the user to select where to save the training data once generated. Next, an image will appear and the user will be prompted to begin selecting all in focus particles. The plot that is presented allows the user to hover the curser over a particle and click on it. The pixel location of the click is recorded. To undo the previous click press BACKSPACE. Once all in focus particles are selected pressing ENTER or RETURN will present the next z slice. After all 10 z slices are presented, the image window will close and the machine learning module will begin generating a model of the data. It will automatically store it where ever told by the user.
 
 If tracking is selected IN ADDITION to training being chosen, the program will begin tracking as soon as the training algorithm has concluded. If tracking is chosen WITHOUT training, a dialog box will appear asking the user to point to the training data that is to be used to track the dataset. Once this has happened, the tracking algorithm will begin running and no further user interaction is needed.
+
+## Variable List
+
+### MAIN.m
+
+global batchSize minTrackSize particleSize
+'zRange =' This is the range in the z-direction you would like to track (by folder name)
+'z_separation =' 2.5; This is the physical separation between z-slices (in microns)
+'tRange =' This is the range in time you would like to track (in # of frames)
+'trainZrange =' The range in the z-direction that you would like to train (in # of frames)
+'trainTrange =' The range in time that you would like to train (in # of frames)
+'particleSize =' GLOBAL The approximate size of the particle (in pixels)
+'batchSize =' GLOBAL The number of reconstructions that are batched together for mean subtraction
+'minTrackSize =' GLOBAL The minumum length of a track in order to be recognized as a particle 
+'threshold =' 100; % This is the maximum distance used in hierarchical clustering (in pixels)
