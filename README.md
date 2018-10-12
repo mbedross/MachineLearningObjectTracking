@@ -113,15 +113,24 @@ If tracking is selected IN ADDITION to training being chosen, the program will b
 
 ## Variable List
 
+Variable lists are organized by the routine they originate from and in alphabetical order.
+
 ### MAIN.m
 
-global batchSize minTrackSize particleSize
-'zRange =' This is the range in the z-direction you would like to track (by folder name)
-'z_separation =' 2.5; This is the physical separation between z-slices (in microns)
-'tRange =' This is the range in time you would like to track (in # of frames)
-'trainZrange =' The range in the z-direction that you would like to train (in # of frames)
-'trainTrange =' The range in time that you would like to train (in # of frames)
-'particleSize =' GLOBAL The approximate size of the particle (in pixels)
-'batchSize =' GLOBAL The number of reconstructions that are batched together for mean subtraction
-'minTrackSize =' GLOBAL The minumum length of a track in order to be recognized as a particle 
-'threshold =' 100; % This is the maximum distance used in hierarchical clustering (in pixels)
+`zRange =` This is the range in the z-direction you would like to track (by folder name)
+
+`z_separation =` 2.5; This is the physical separation between z-slices (in microns)
+
+`tRange =` This is the range in time you would like to track (in # of frames)
+
+`trainZrange =` The range in the z-direction that you would like to train (in # of frames)
+
+`trainTrange =` The range in time that you would like to train (in # of frames)
+
+`particleSize =` GLOBAL The approximate size of the particle (in pixels)
+
+`batchSize =` GLOBAL The number of reconstructions that are batched together for mean subtraction
+
+`minTrackSize =` GLOBAL The minumum length of a track in order to be recognized as a particle 
+
+`threshold =` 100; % This is the maximum distance used in hierarchical clustering (in pixels)
