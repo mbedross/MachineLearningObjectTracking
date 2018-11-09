@@ -183,7 +183,7 @@ Variable lists are organized by the routine they originate from and in alphabeti
 
 `t =` An index variable specifying the current time point that is being analyzed
 
-### import4D.m
+### createImgDataStore.m
 
 `zRange =` [Defined in MAIN.m] This is the range in the z-direction you would like to track (by folder name)
 
@@ -236,4 +236,12 @@ Variable lists are organized by the routine they originate from and in alphabeti
 `times =` An array with the frame numbers of all non-duplicate frames in the data set
 
 `tNF =` The number of non-duplicate frame numbers in the data set (length of `times` array)
+
+`dsIndex =` The index of file(s) to be imported from the datastore of images
+
+`particleCoords =` An nx4 vector. n is the number of coordinates and the four columns are the xyzt coordinate points, respectively
+
+`img =` The image file that is read from the datastore
+
+### getParticleCoordsZ.m
 

@@ -1,4 +1,4 @@
-function [particleCoords] = getParticleCoordsXY(trainZrange, trainTrange)
+function [particleCoords] = getParticleCoordsXY(trainZrange, trainTrange, ds)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -34,12 +34,14 @@ function [particleCoords] = getParticleCoordsXY(trainZrange, trainTrange)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global masterDir
+global ds
+global zNF
 
 % First import mean subtracted and filtered reconstructions into an iamge
-% datastore (ds)
+%datastore (ds)
 addpath('./supportingAlgorithms');
 load(fullfile(masterDir, 'MeanStack','metaData.mat'))
-[ds, zNF] = import4D(zSorted, trainZrange);
+%[ds, zNF] = import4D(zSorted, trainZrange);
 
 zCenter = zSorted(floor(length(zSorted)/2));
 zCenterIdx = find(zSorted==zCenter);

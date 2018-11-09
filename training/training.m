@@ -1,4 +1,4 @@
-function [b, Xtrain] = training(trainZrange, trainTrange)
+function [b, Xtrain] = training(trainZrange, trainTrange, ds)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -33,6 +33,11 @@ function [b, Xtrain] = training(trainZrange, trainTrange)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global masterDir
+global ds
+gloabl zNF
+
+% Create a datastore of images
+[ds, zNF] = createImgDataStore(zSorted, trainZrange);
 
 cropSize = 15;
 

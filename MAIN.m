@@ -162,7 +162,7 @@ if track == 1
     end
     
     % Create Image Datastore of entire XYZt stack
-    [ds, zNF] = import4D(zSorted, zRange);
+    [ds, zNF] = createImgDataStore(zSorted, zRange);
     
     zRangeSorted = zSorted;
     zRangeSorted(zSorted > zRange(2)) = [];
