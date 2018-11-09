@@ -63,7 +63,16 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ask user for inputs
-global batchSize minTrackSize particleSize
+global batchSize
+global minTrackSize
+global particleSize
+global type
+global masterDir
+global n 
+global zSorted
+gloabl zNF
+global tNF
+
 % These next few lines will be replaced by a GUI soon!
 zRange = [-30, -14];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
@@ -77,7 +86,7 @@ minTrackSize = 20; % The minumum length of a track in order to be recorded
 threshold = 100; % This is the maximum distance used in hierarchical clustering (distance is units of pixels)
 
 addpath('.\GUI')
-global type
+
 [preProcess, train, track, type, Quit] = initGUI();
 
 if preProcess == 1
@@ -92,7 +101,7 @@ end
 
 %% Misc. parameters
 
-global masterDir
+
 masterDir = uigetdir('Choose Data Parent Directory');
 
 % Define tracking parameters
@@ -109,7 +118,7 @@ addpath('.\supportingAlgorithms');
 addpath('.\preProcessing');
 
 % Define global variables
-global n
+
 zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(1))));
 n = getImageSize(trainTrange(1));
 

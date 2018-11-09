@@ -1,4 +1,4 @@
-function [b, Xtrain] = training(trainZrange, trainTrange, ds)
+function [b, Xtrain] = training(trainZrange, trainTrange)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -34,12 +34,11 @@ function [b, Xtrain] = training(trainZrange, trainTrange, ds)
 
 global masterDir
 global ds
+global zSorted
 gloabl zNF
 
 % Create a datastore of images
-[ds, zNF] = createImgDataStore(zSorted, trainZrange);
-
-cropSize = 15;
+[ds, zNF_range, zSorted_range] = createImgDataStore(trainZrange);
 
 [trainFileName, trainPath] = uiputfile('*.mat','Choose Where to Save Training Data file');
 filename = fullfile(trainPath, trainFileName);
@@ -52,7 +51,7 @@ else
     numParticle = 0;
     while trainLock
         tempCoords = getParticleCoordsXY(trainZrange, trainTrange);
-        tempCoords = getParticleCoordsZ(tempCoords, trainZrange, trainTrange)
+        tempCoords = getParticleCoordsZ(tempCoords, trainZrange, trainTrange, z)
         numParticle = numParticle + 1;
         particleCoords{numParticle, :} = [tempCoords];
         track = questdlg('Would you like to track another particle?', 'Yes','No','Yes');

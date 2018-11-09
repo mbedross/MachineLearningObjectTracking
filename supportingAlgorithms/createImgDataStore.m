@@ -1,4 +1,4 @@
-function [ds, zNF] = createImgDataStore(zSorted, zRange)
+function [ds, zNF_range, zSorted_range] = createImgDataStore(zRange)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -18,15 +18,18 @@ function [ds, zNF] = createImgDataStore(zSorted, zRange)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-global type masterDir
+global type
+global masterDir
+global zSorted
 
 % Define the range in z-steps to use in training
-zSorted(zSorted > zRange(2)) = [];
-zSorted(zSorted < zRange(1)) = [];
-zNF = length(zSorted);
+zSorted_range = zSorted;
+zSorted_range(zSorted > zRange(2)) = [];
+zSorted_range(zSorted < zRange(1)) = [];
+zNF_range = length(zSorted_range);
 
-for z = 1 : zNF
-    location{z} = fullfile(masterDir, 'MeanStack', char(type), sprintf('%0.2f', zSorted(z)));
+for z = 1 : zNF_range
+    location{z} = fullfile(masterDir, 'MeanStack', char(type), sprintf('%0.2f', zSorted_range(z)));
 end
 
 ds = datastore(location, 'IncludeSubfolders', true,'FileExtensions', '.tiff','Type', 'image');
