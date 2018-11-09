@@ -1,4 +1,4 @@
-function [ds, zNF] = import4D(zSorted, zRange)
+function [ds, zNF] = createImgDataStore(zSorted, zRange)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %

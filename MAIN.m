@@ -68,8 +68,8 @@ global batchSize minTrackSize particleSize
 zRange = [-30, -14];  % This is the zRange you would like to track
 z_separation = 2.5; % This is the physical separation between z-slices (in microns)
 tRange = [1, 335];  % This is the time range you would like to track
-trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
-%trainZrange = [-25, -24];
+%trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
+trainZrange = [-25, -24];
 trainTrange = [1, 10];
 particleSize = 30; % Approximate size of the particle in pixels
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
@@ -119,7 +119,7 @@ end
 
 centerx = n(1)/2;
 centery = n(2)/2;
-innerRadius = 40;
+innerRadius = 25;
 outerRadius = 310; %310 for common mode
 
 %% Main section
