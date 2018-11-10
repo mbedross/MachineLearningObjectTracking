@@ -38,7 +38,10 @@ global zSorted
 gloabl zNF
 
 % Create a datastore of images
-[ds, zNF_range, zSorted_range] = createImgDataStore(trainZrange);
+[ds] = createImgDataStore();
+
+% Define the range of Z slices to train on as global indices of zSorted 
+trainZrange_index = [find(zSorted == trainZrange(1)) find(zSorted == trainZrange(2))]
 
 [trainFileName, trainPath] = uiputfile('*.mat','Choose Where to Save Training Data file');
 filename = fullfile(trainPath, trainFileName);
@@ -50,8 +53,8 @@ else
     trainLock = 1;
     numParticle = 0;
     while trainLock
-        tempCoords = getParticleCoordsXY(trainZrange, trainTrange);
-        tempCoords = getParticleCoordsZ(tempCoords, trainZrange, trainTrange, z)
+        tempCoords = getParticleCoordsXY(trainZrange_index, trainTrange);
+        tempCoords = getParticleCoordsZ(tempCoords, trainZrange_index, trainTrange, zSorted_range)
         numParticle = numParticle + 1;
         particleCoords{numParticle, :} = [tempCoords];
         track = questdlg('Would you like to track another particle?', 'Yes','No','Yes');
@@ -61,6 +64,32 @@ else
     end
     save(coordName, 'bugCoords')
 end
+
+% For each particle at each time point, generate the 3D image to then be formatted as
+% a predictor matrix
+numTimePoints = trainTrange(2)-trainTrange(1)+1
+for i = 1 : length(particleCoords)
+    tempCoords = particleCoords{i,:};
+    for j = 1 : numTimePoints
+        zSlice = tempCoords(j,3);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

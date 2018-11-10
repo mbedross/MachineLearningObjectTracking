@@ -1,4 +1,4 @@
-function [particleCoords] = getParticleCoordsZ(xyCoords, trainZrange, trainTrange, ds)
+function [particleCoords] = getParticleCoordsZ(xyCoords, trainZrange, trainTrange, zSorted_range)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -40,50 +40,37 @@ global masterDir
 global particleSize
 global ds
 global zNF
+global zSorted
+global zDepth
 
 % First import mean subtracted and filtered reconstructions into an iamge
-%datastore (ds)
 addpath('./supportingAlgorithms');
-load(fullfile(masterDir, 'MeanStack','metaData.mat'))
-%[ds, zNF] = import4D(zSorted, trainZrange);
+load(fullfile(masterDir, 'MeanStack','metaData.mat'));
 
-zCenter = zSorted(floor(length(zSorted)/2));
-zCenterIdx = find(zSorted==zCenter);
-tNF = length(times);
+% The range of y values to plot
+yRange = -2*particleSize:2*particleSize;
 
-zSortedRange = zSorted;
-zSortedRange(zSorted > trainZrange(2)) = [];
-zSortedRange(zSorted < trainZrange(1)) = [];
-zRangeNF = length(zSortedRange);
-zNF = length(zSorted);
-
-% The time and number of z slices to analyze when constructing XZ slices
-time = trainTrange(1);
-
-nom_dsIndex_init = zCenterIdx*tNF + trainTrange(1)-1
-dsRange = -zRangeNF:zRangeNF;
-
-numZ = length(dsRange);
-yRange = -2*particleSize:2*particleSize
-
-xzSlice = zeros(numZ, 4*particleSize+1)
+xzSlice = zeros(zDepth, 4*particleSize+1)
 % Loop through all time points for this particle
 for t = 1 : length(trainTrange)
-	nom_dsIndex = nom_dsIndex_init+t;
-	dsIndex = nom_dsIndex+dsRange.*tNF;
+	dsIndex = getDSindex(xyCoords(t, 3),xyCoords(t, 4));
 	xCoord = xyCoords(t,1);
 	yCoord = xyCoords(t,2);
 
 	%Assemble an XZ slice of the particle at a particular time
-	for i = 1 : numZ
-		img = readimage(ds, dsIndex(i));
-		xzSlice(i,:) = img(xCoord, yCoord+yRange(1):yCoord+yRange(end))
+	currentZ = zeros(1, zDepth);
+	for i = 0 : zDepth - 1
+		currentZ(i) = xyCoords(t,4)-(zDepth-1)/2 + i
+		tempDSindex = getDSindex(, xyCoords(t,4))
+		img = readimage(ds, tempDSindex;
+		xzSlice(i+1,:) = img(xCoord, yCoord+yRange(1):yCoord+yRange(end))
 	end
 	% The XZ slice display is scaled 1:15 because of the non-uniform voxel size between the x and z z-direction
 	h1 = figure(1)
 	imshow(xzSlice, [], 'XData', [0 1], 'YData', [0 15]);
 	title('Select the point at which the particle is in focus (the waist of the PSF). Press ENTER when done.')
 	[X,Z] = getpts;
-    x = mean(X); y = mean(Z);
-	particleCoords(t,3) = zSortedRange(z);
+    x = mean(X); z = floor(mean(Z));
+	particleCoords(t,3) = currentZ(z);
 end
+

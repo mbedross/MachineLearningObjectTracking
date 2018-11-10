@@ -1,4 +1,4 @@
-function [index] = getDSindex(zNF_range, zDesired, tDesired)
+function [index] = getDSindex(zDesired, tDesired)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -19,8 +19,9 @@ function [index] = getDSindex(zNF_range, zDesired, tDesired)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 global tNF
+global zNF
 
-totalIndex = zNF_range*tNF;
+totalIndex = zNF*tNF;
 index = zDesired*tNF + tDesired;
 
 if index > totalIndex

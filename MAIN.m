@@ -72,6 +72,7 @@ global n
 global zSorted
 gloabl zNF
 global tNF
+global zDepth
 
 % These next few lines will be replaced by a GUI soon!
 zRange = [-30, -14];  % This is the zRange you would like to track
@@ -81,9 +82,13 @@ tRange = [1, 335];  % This is the time range you would like to track
 trainZrange = [-25, -24];
 trainTrange = [1, 10];
 particleSize = 30; % Approximate size of the particle in pixels
+pixelPitch = 350/2048; % Size of each pixel in the image (in microns)
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
 threshold = 100; % This is the maximum distance used in hierarchical clustering (distance is units of pixels)
+
+zDepth = 2*ceil((2*particleSize*pixelPitch)/z_separation)+1; % number of z-slices to use while tracking
+
 
 addpath('.\GUI')
 
@@ -100,8 +105,6 @@ if Quit == 1
 end
 
 %% Misc. parameters
-
-
 masterDir = uigetdir('Choose Data Parent Directory');
 
 % Define tracking parameters

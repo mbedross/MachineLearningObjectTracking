@@ -1,4 +1,4 @@
-function [particleCoords] = getParticleCoordsXY(trainZrange, trainTrange, ds)
+function [particleCoords] = getParticleCoordsXY(trainZrange_index, trainTrange)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -11,7 +11,7 @@ function [particleCoords] = getParticleCoordsXY(trainZrange, trainTrange, ds)
 %
 % The user will first be shown a single reconstruction a the first time point
 % specified in the trainTrange variable, at the center z-plane specified by
-% the trainZrange variable. With this image, the user will select eith an in-
+% the trainZrange_index variable. With this image, the user will select eith an in-
 % focus or out of foucs particle. (Note: Choose a single partlice)
 %
 % Next the user will be presented the next chronological image (same z-plane
@@ -36,21 +36,18 @@ function [particleCoords] = getParticleCoordsXY(trainZrange, trainTrange, ds)
 global masterDir
 global ds
 global zNF
+gloabl tNF
+global zSorted
 
 % First import mean subtracted and filtered reconstructions into an iamge
-%datastore (ds)
 addpath('./supportingAlgorithms');
-load(fullfile(masterDir, 'MeanStack','metaData.mat'))
-%[ds, zNF] = import4D(zSorted, trainZrange);
+load(fullfile(masterDir, 'MeanStack','metaData.mat'));
 
-zCenter = zSorted(floor(length(zSorted)/2));
-zCenterIdx = find(zSorted==zCenter);
-tNF = length(times);
+zCenter = floor((trainZrange_index(1)+trainZrange_index(2))/2);
 
-dsIndex = zCenterIdx*tnF + trainTrange(1) - 1;
+dsIndex = zCenter*tnF + trainTrange(1) - 1;
 particleCoords = zeros(10, 4);
-
-for i = 1 : length(trainTrange)
+for i = 1 : trainTrange(2)-trainTrange(1)+1
     h1 = figure(1)
     img = readimage(ds, dsIndex + i);
     imagesc(img)
@@ -62,7 +59,8 @@ for i = 1 : length(trainTrange)
         title(sprintf('Please select the same particle you wish to track. %f z-plane is shown. Press ENTER when youve selected the single particle', zCenter))
     end
     [X,Y] = getpts;
-    x = mean(X); y = mean(Y);
-    particleCoords(i,:) = [x, y, zCenter, dsIndex+i];
+    x = floor(mean(X));
+    y = floor(mean(Y));
+    particleCoords(i,:) = [x, y, zCenter, trainTrange(1)+i];
 end
 close(h1)
