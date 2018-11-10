@@ -1,4 +1,4 @@
-function [particleCoords] = getParticleCoordsZ(xyCoords, trainZrange, trainTrange, zSorted_range)
+function [particleCoords] = getParticleCoordsZ(xyCoords)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -52,7 +52,7 @@ yRange = -2*particleSize:2*particleSize;
 
 xzSlice = zeros(zDepth, 4*particleSize+1)
 % Loop through all time points for this particle
-for t = 1 : length(trainTrange)
+for t = 1 : size(xyCoords,1)
 	dsIndex = getDSindex(xyCoords(t, 3),xyCoords(t, 4));
 	xCoord = xyCoords(t,1);
 	yCoord = xyCoords(t,2);

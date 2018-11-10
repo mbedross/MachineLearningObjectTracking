@@ -54,7 +54,7 @@ else
     numParticle = 0;
     while trainLock
         tempCoords = getParticleCoordsXY(trainZrange_index, trainTrange);
-        tempCoords = getParticleCoordsZ(tempCoords, trainZrange_index, trainTrange, zSorted_range)
+        tempCoords = getParticleCoordsZ(tempCoords)
         numParticle = numParticle + 1;
         particleCoords{numParticle, :} = [tempCoords];
         track = questdlg('Would you like to track another particle?', 'Yes','No','Yes');
@@ -67,11 +67,14 @@ end
 
 % For each particle at each time point, generate the 3D image to then be formatted as
 % a predictor matrix
-numTimePoints = trainTrange(2)-trainTrange(1)+1
 for i = 1 : length(particleCoords)
     tempCoords = particleCoords{i,:};
+    numTimePoints = size(tempCoords,1)
     for j = 1 : numTimePoints
         zSlice = tempCoords(j,3);
+        tPoint = tempCoords(j,4);
+        imIndex = getDSindex(zSlice, tPoint);
+        
 
 
 
