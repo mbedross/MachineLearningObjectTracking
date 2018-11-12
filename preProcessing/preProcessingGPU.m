@@ -31,6 +31,11 @@ times(logical(dupes)) = [];
 for i = 1 : length(type)
     zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(i))));
     NF = length(zSorted);
+    [x, y] = meshgrid((1:N(1)), (1:N(2)));
+    apodizingXmask = cos((x-N(1)/2)/N(1)*pi()).^.25;
+    apodizingYmask = cos((y-N(2)/2)/N(2)*pi()).^.25;
+
+    apodizingMask = 
     for j = 1 : NF
         reconPath = fullfile(masterDir, 'Stack', char(type(i)), sprintf('%0.2f', zSorted(j)));
         dataDir = fullfile(meanDir, char(type(i)), sprintf('%0.2f', zSorted(j)));
@@ -45,6 +50,11 @@ for i = 1 : length(type)
         for k = 0 : batches - 1
             parfor ii = 1 : bSize
                 I(:, :, ii) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(k*bSize+ii))));
+                if strcmp(type(i), 'Phase')
+                    % Apodize the phase image to eliminate noise at image boundary and increase dynamic range of image
+                    tempPhaseImg = I(:,:,ii);
+                    I(:,:,ii) = tempPhaseImg.*apodizingXmask*apodizingYmask
+                end
             end
             I_mean = meanSubtraction(I);
             
@@ -60,6 +70,11 @@ for i = 1 : length(type)
         I = gpuArray(zeros(N(1), N(2), length(times)-batches*bSize));
         parfor jj = 1 : (length(times)-batches*bSize)
             I(:, :, jj) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(batches*bSize+jj))));
+            if strcmp(type(i), 'Phase')
+                % Apodize the phase image to eliminate noise at image boundary and increase dynamic range of image
+                tempPhaseImg = I(:,:,ii);
+                I(:,:,ii) = tempPhaseImg.*apodizingXmask*apodizingYmask
+            end
         end
         I_mean = meanSubtraction(I);
         % Now save the mean subtracted images

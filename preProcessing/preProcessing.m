@@ -45,6 +45,11 @@ for i = 1 : length(type)
         for k = 0 : batches - 1
             parfor ii = 1 : bSize
                 I(:, :, ii) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(k*bSize+ii))));
+                if strcmp(type(i), 'Phase')
+                    % Apodize the phase image to eliminate noise at image boundary and increase dynamic range of image
+                    tempPhaseImg = I(:,:,ii);
+                    I(:,:,ii) = tempPhaseImg.*apodizingXmask*apodizingYmask
+                end
             end
             I_mean = meanSubtraction(I);
             
@@ -60,6 +65,11 @@ for i = 1 : length(type)
         I = zeros(N(1), N(2), length(times)-batches*bSize);
         parfor jj = 1 : (length(times)-batches*bSize)
             I(:, :, jj) = imread(fullfile(reconPath, sprintf('%05d.tiff', times(batches*bSize+jj))));
+            if strcmp(type(i), 'Phase')
+                % Apodize the phase image to eliminate noise at image boundary and increase dynamic range of image
+                tempPhaseImg = I(:,:,ii);
+                I(:,:,ii) = tempPhaseImg.*apodizingXmask*apodizingYmask
+            end
         end
         I_mean = meanSubtraction(I);
         % Now save the mean subtracted images
