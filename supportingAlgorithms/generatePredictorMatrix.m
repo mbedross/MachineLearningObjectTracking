@@ -1,9 +1,9 @@
-function [X] = generatePredictorMatrix(inputPredictor)
+function [X] = generatePredictorMatrix(inputPredictor, sizeX)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Author: Manuel Bedrossian, Caltech
-% Date Created: 2018.10.10
+% Date Created: 2018.11.09
 %
 % This function takes in as an input, a series of images that it is to
 % condition and format in order to be accepted by downstream ML functions
@@ -13,6 +13,8 @@ function [X] = generatePredictorMatrix(inputPredictor)
 % 
 % p is expected to be an odd number where there is a center 'z' slice and 
 % (p-1)/2 z slices on either side of it.
+%
+% The second input, sizeX is the output of sizePredictorMatrix.m
 %
 % The image characteristics that are considered when generating the
 % predictor matrix X are as follows:
@@ -29,28 +31,21 @@ function [X] = generatePredictorMatrix(inputPredictor)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[d] = size(inputPredictor);
-
-% Calculate image differences in the z direction
-dz = diff(inputPredictor, 1, 3);
-dz_serialized = reshape(dz, [1, numel(dz)]);
-
 % Preallocate memory for predictor matrix
-lengthdz = numel(dz);
-lengthGmag = d(1)*d(2)*d(3);
-lengthGdir = lengthGmag;
-lengthSNR = lengthGmag;
-lengthFFT = 3*lengthGmag; % x3 because of magnitude, real, and imaginary parts
-lengthX = lengthdz + lengthGmag + lengthGdir + lengthSNR + lengthFFT;
-
+lengthdz   = sizeX(1);
+lengthGmag = sizeX(2);
+lengthGdir = sizeX(3);
+lengthSNR  = sizeX(4);
+lengthFFT  = sizeX(5)
+lengthX    = sum(sizeX);
 Gmag_serialized = zeros(1, lengthGmag);
 Gdir_serialized = zeros(1, lengthGdir);
-SNR_serialized = zeros(1, lengthSNR);
-FFT_serialized = zeros(1, lengthFFT);
+SNR_serialized  = zeros(1, lengthSNR);
+FFT_serialized  = zeros(1, lengthFFT);
 Gmag_index = 0;
 Gidr_index = 0;
-SNR_index = 0;
-FFT_index = 0;
+SNR_index  = 0;
+FFT_index  = 0;
 X = zeros(1, lengthX);
 
 % Loop through the inputPredictor matrix and calculate characteristics to use in X

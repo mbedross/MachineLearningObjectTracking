@@ -61,8 +61,8 @@ for t = 1 : size(xyCoords,1)
 	currentZ = zeros(1, zDepth);
 	for i = 0 : zDepth - 1
 		currentZ(i) = xyCoords(t,4)-(zDepth-1)/2 + i
-		tempDSindex = getDSindex(, xyCoords(t,4))
-		img = readimage(ds, tempDSindex;
+		tempDSindex = getDSindex(currentZ(i), xyCoords(t,4))
+		img = readimage(ds, tempDSindex);
 		xzSlice(i+1,:) = img(xCoord, yCoord+yRange(1):yCoord+yRange(end))
 	end
 	% The XZ slice display is scaled 1:15 because of the non-uniform voxel size between the x and z z-direction

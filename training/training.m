@@ -36,6 +36,8 @@ global masterDir
 global ds
 global zSorted
 gloabl zNF
+global zDepth
+global n
 
 % Create a datastore of images
 [ds] = createImgDataStore();
@@ -67,87 +69,37 @@ end
 
 % For each particle at each time point, generate the 3D image to then be formatted as
 % a predictor matrix
+tempCoords = particleCoords{1,:};
+numTimePoints = size(tempCoords,1);
+sizeX = sizePredictorMatrix(n(1),n(2),zDepth)
+Img = zeros(n(1), n(2), zDepth);
+X = zeros(length(particleCoords)*numTimePoints,sizeX);
+Y = zeros(length(particleCoords)*numTimePoints, 2);
+X_zRanges = zeros(numTimePoints, zDepth);
+X_indices = zeros(numTimePoints, zDepth);
 for i = 1 : length(particleCoords)
     tempCoords = particleCoords{i,:};
     numTimePoints = size(tempCoords,1)
+    Y(((i-1)*numTimePoints)+1 : ((i-1)*numTimePoints)+numTimePoints,:) = tempCoords(:,1:2);
     for j = 1 : numTimePoints
         zSlice = tempCoords(j,3);
         tPoint = tempCoords(j,4);
-        imIndex = getDSindex(zSlice, tPoint);
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-croppedDt = cropEdges(dTrain, cropSize);
-dTrain = addEdges(croppedDt, cropSize);
-
-Xtrain = zeros(0,9);
-for z = 1 : size(dTrain,3)
-    if z == 1
-        input_slice(:,:,1) = dTrain(:,:,z);
-        input_slice(:,:,2) = dTrain(:,:,z);
+        for k = 0 : zDepth -1
+            X_zRanges(j,k+1) = zSlice - (zDepth-1)/2 + i;
+            Img(:,:,k+1) = readimage(ds, tempDSindex;
+            X_indices(j,k+1) = getDSindex(X_zRanges(j,k+1), tPoint);
+        end
+    X(((i-1)*numTimePoints)+j,:) = generatePredictorMatrix(inputPredictor, sizeX);
     end
-    if z ==2
-        input_slice(:,:,1) = dTrain(:,:,z-1);
-        input_slice(:,:,2) = dTrain(:,:,z-1);
-    end
-    if z ~= 1 && z ~= 2
-        input_slice(:,:,1) = dTrain(:,:,z-2);
-        input_slice(:,:,2) = dTrain(:,:,z-1);
-    end
-    input_slice(:,:,3) = dTrain(:,:,z);
-    if z == size(dTrain,3)
-        input_slice(:,:,4) = dTrain(:,:,z);
-        input_slice(:,:,5) = dTrain(:,:,z);
-    end
-    if z == size(dTrain,3) - 1
-        input_slice(:,:,4) = dTrain(:,:,z+1);
-        input_slice(:,:,5) = dTrain(:,:,z+1);
-    end
-    if z ~= size(dTrain,3) && z~= size(dTrain,3) - 1
-        input_slice(:,:,4) = dTrain(:,:,z+1);
-        input_slice(:,:,5) = dTrain(:,:,z+2);
-    end
-    Xtrain = [Xtrain; getInputMatrixV5zs(input_slice)];
 end
 
-yCoords = zeros(size(dTrain,1),size(dTrain,2),size(dTrain,3));
-
-for i = 1:size(bugCoords,1)
-    xval = bugCoords(i,1);
-    yval = bugCoords(i,2);
-    zval = bugCoords(i,3);
-    yCoords(yval,xval,zval) = 1;
-end
-
-yTrain = yCoords(:);
-
-% Use the coordinate information found earlier to begin generating linear
-% models to be used as a training data set
 tic
-[b,dev] = glmfit(Xtrain,yTrain,'binomial','link','logit');
+SVMModel = fitcsvm(X,Y);
 toc
 
+% With the SVM model generated, save the model parameters
 if exist(filename, 'file') == 2
-    save(filename, 'b', '-append')
+    save(filename, 'SVMModel', '-append')
 else
-    save(filename, 'b')
+    save(filename, 'SVMModel')
 end
