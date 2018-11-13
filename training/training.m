@@ -38,6 +38,10 @@ global zSorted
 gloabl zNF
 global zDepth
 global n
+global particleSize
+
+% Desired size of sub-image
+sizeImageXY = 4*particleSize;
 
 % Create a datastore of images
 [ds] = createImgDataStore();
@@ -52,11 +56,12 @@ coordName = fullfile(masterDir, 'BugCoords.mat');
 if exist(coordName, 'file') == 2
     load(coordName);
 else
+    % Ask user to select coordinates with particles in the FOV
     trainLock = 1;
     numParticle = 0;
     while trainLock
-        tempCoords = getParticleCoordsXY(trainZrange_index, trainTrange);
-        tempCoords = getParticleCoordsZ(tempCoords)
+        tempCoords = getParticleCoordsXY(trainZrange_index, trainTrange, 1);
+        tempCoords = getParticleCoordsZ(tempCoords, 1)
         numParticle = numParticle + 1;
         particleCoords{numParticle, :} = [tempCoords];
         track = questdlg('Would you like to track another particle?', 'Yes','No','Yes');
@@ -64,33 +69,59 @@ else
             trainLock = 0;
         end
     end
-    save(coordName, 'bugCoords')
+    % Ask user to select coordinates with NO particles in the FOV
+    trainTrange_empty = [trainTrange(1), numParticle*(trainTrange(2)-trainTrange(1)+1)];
+    tempCoords = getParticleCoordsXY(trainZrange_index, trainTrange_empty, 0);
+    emptyCoords = [tempCoords];
+    save(coordName, 'bugCoords', 'emptyCoords')
 end
 
 % For each particle at each time point, generate the 3D image to then be formatted as
 % a predictor matrix
+sizeSubImage = [sizeImageXY, sizeImageXY, zDepth];
 tempCoords = particleCoords{1,:};
 numTimePoints = size(tempCoords,1);
-sizeX = sizePredictorMatrix(n(1),n(2),zDepth)
-Img = zeros(n(1), n(2), zDepth);
-X = zeros(length(particleCoords)*numTimePoints,sizeX);
-Y = zeros(length(particleCoords)*numTimePoints, 2);
+sizeX = sizePredictorMatrix(sizeSubImage(1),sizeSubImage(2),sizeSubImage(3));
+Img = zeros(sizeSubImage(1),sizeSubImage(2),sizeSubImage(3));
+X = zeros(length(particleCoords)*numTimePoints+length(emptyCoords),sizeX);
+Y = zeros(length(particleCoords)*numTimePoints+length(emptyCoords), 1);
 X_zRanges = zeros(numTimePoints, zDepth);
 X_indices = zeros(numTimePoints, zDepth);
 for i = 1 : length(particleCoords)
     tempCoords = particleCoords{i,:};
     numTimePoints = size(tempCoords,1)
-    Y(((i-1)*numTimePoints)+1 : ((i-1)*numTimePoints)+numTimePoints,:) = tempCoords(:,1:2);
     for j = 1 : numTimePoints
         zSlice = tempCoords(j,3);
         tPoint = tempCoords(j,4);
         for k = 0 : zDepth -1
             X_zRanges(j,k+1) = zSlice - (zDepth-1)/2 + i;
-            Img(:,:,k+1) = readimage(ds, tempDSindex;
             X_indices(j,k+1) = getDSindex(X_zRanges(j,k+1), tPoint);
+            I = readimage(ds, X_indices(j,k+1));
+            xRange = [tempCoords(j,1)-floor(sizeImageXY/2), tempCoords(j,1)-floor(sizeImageXY/2)+sizeImageXY];
+            yRange = [tempCoords(j,2)-floor(sizeImageXY/2), tempCoords(j,2)-floor(sizeImageXY/2)+sizeImageXY];
+            Img(:,:,k+1) = I(xRange(1):xRange(2), yRange(1):yRange(2))
         end
-    X(((i-1)*numTimePoints)+j,:) = generatePredictorMatrix(inputPredictor, sizeX);
+    X(((i-1)*numTimePoints)+j,:) = generatePredictorMatrix(Img, sizeX);
+    Y(((i-1)*numTimePoints)+j) = 1;
     end
+end
+
+lastIndexX = ((i-1)*numTimePoints)+j;
+
+% For each coordinate of empty space, generate the 3D image to then be formatted as
+% a predictor matrix
+for ii = 1 : legnth(emptyCoords)
+    zSlice = emptyCoords(ii, 3);
+    tPoint = emptyCoords(ii, 4);
+    for k = 0 : zDepth -1
+        X_zRanges(lastIndexX+ii,k+1) = zSlice - (zDepth-1)/2 + i;
+        X_indices(lastIndexX+ii,k+1) = getDSindex(X_zRanges(lastIndexX+ii,k+1), tPoint);
+        I = readimage(ds, X_indices(lastIndexX+ii,k+1));
+        xRange = [emptyCoords(ii,1)-floor(sizeImageXY/2), emptyCoords(j,1)-floor(sizeImageXY/2)+sizeImageXY];
+        yRange = [emptyCoords(j,2)-floor(sizeImageXY/2), emptyCoords(j,2)-floor(sizeImageXY/2)+sizeImageXY];
+        Img(:,:,k+1) = I(xRange(1):xRange(2), yRange(1):yRange(2))
+    end
+    X(lastIndexX+ii,:) = generatePredictorMatrix(Img, sizeX);
 end
 
 tic

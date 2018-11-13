@@ -1,4 +1,4 @@
-function [particleCoords] = getParticleCoordsXY(trainZrange_index, trainTrange)
+function [particleCoords] = getParticleCoordsXY(trainZrange_index, particleORempty)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -53,10 +53,14 @@ for i = 1 : trainTrange(2)-trainTrange(1)+1
     imagesc(img)
     axis equal
     colormap gray
-    if i = 1
-        title(sprintf('Please select a single particle you wish to track. %f z-plane is shown. Press ENTER when youve selected the single particle', zCenter))
+    if particleORempty ==1
+        if i = 1
+            title(sprintf('Please select a single particle you wish to track. %f z-plane is shown. Press ENTER when youve selected the single particle', zCenter))
+        else
+            title(sprintf('Please select the same particle you wish to track. %f z-plane is shown. Press ENTER when youve selected the single particle', zCenter))
+        end
     else
-        title(sprintf('Please select the same particle you wish to track. %f z-plane is shown. Press ENTER when youve selected the single particle', zCenter))
+        title(sprintf('Please select a region with NO particle in it. %f z-plane is shown. Press ENTER when youve selected the region', zCenter))
     end
     [X,Y] = getpts;
     x = floor(mean(X));
