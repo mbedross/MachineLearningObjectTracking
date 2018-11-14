@@ -1,4 +1,4 @@
-function [b, Xtrain] = training(trainZrange, trainTrange)
+function [SVMmodel, sizeSubImage] = training(trainZrange, trainTrange)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -125,12 +125,19 @@ for ii = 1 : legnth(emptyCoords)
 end
 
 tic
-SVMModel = fitcsvm(X,Y);
+% Train a Support Vector Machine model based on the predictor matrix X and class labels Y
+[SVMmodel] = fitcsvm(X,Y);
+% Compute the optimal transfer function between fit scores and posterior probabilities of
+% the SVM model using the predictor matrix X and class labels Y
+[SVMmodel] = fitSVMPosterior(SVMmodel, X, Y);
 toc
+
+% Calculating the optimal score to posterior probability transfer function allows the SVM
+% model to output confidence intervals on its predictions as a probability (a value between 0 and 1)
 
 % With the SVM model generated, save the model parameters
 if exist(filename, 'file') == 2
-    save(filename, 'SVMModel', '-append')
+    save(filename, 'SVMmodel', 'sizeSubImage', '-append')
 else
-    save(filename, 'SVMModel')
+    save(filename, 'SVMmodel', 'sizeSubImage')
 end

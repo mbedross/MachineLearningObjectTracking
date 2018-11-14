@@ -73,6 +73,8 @@ global zSorted
 gloabl zNF
 global tNF
 global zDepth
+global zRange
+global tRange
 
 % These next few lines will be replaced by a GUI soon!
 zRange = [-30, -14];  % This is the zRange you would like to track
@@ -81,7 +83,7 @@ tRange = [1, 335];  % This is the time range you would like to track
 %trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
 trainZrange = [-25, -24];
 trainTrange = [1, 10];
-particleSize = 30; % Approximate size of the particle in pixels
+particleSize = 30; % Approximate size of the particle in pixels (MUST BE INTEGER)
 pixelPitch = 350/2048; % Size of each pixel in the image (in microns)
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
@@ -126,7 +128,7 @@ zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(1))));
 n = getImageSize(trainTrange(1));
 
 if strcmp(char(type(1)), 'DIC')
-    n = [2048, 2047];
+    n = [n(1), (n(2)-1)];
 end
 
 centerx = n(1)/2;
@@ -150,120 +152,13 @@ if train == 1
     if preProcess == 0
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
-    [b, Xtrain] = training(trainZrange, trainTrange);
+    [model, imageSize] = training(trainZrange, trainTrange);
 end
 if track == 1
-    % If the dataset is already trained, load the model variables
-    if train == 0
-        [trainFileName, trainPath] = uigetfile('*.mat','Choose Training Data file');
-        trainDir = fullfile(trainPath, trainFileName);
-        load(trainDir);
-        load(fullfile(masterDir, 'MeanStack','metaData.mat'))
-    end
-    % If tracking data already exists, load it
-    % This is a temporary file that saves after each iteration in order to
-    % prevent data loss as a result of an error or power failure
-    trackData = fullfile(masterDir,'tempTrackData.mat');
-    if exist(trackData, 'file') == 2
-        load(trackData)
-        latestTime = t;
-        clear t
+    if train == 1
+        [coordinates] = detection(model, train, imageSize)
     else
-        latestTime = 1;
-        pointz = zeros(0,3);
+        [coordinates] = detection(model, train)
     end
-    
-    % Create Image Datastore of entire XYZt stack
-    [ds, zNF] = createImgDataStore(zSorted, zRange);
-    
-    zRangeSorted = zSorted;
-    zRangeSorted(zSorted > zRange(2)) = [];
-    zRangeSorted(zSorted < zRange(1)) = [];
-    numZ = length(zRangeSorted);
-    zStepsPerBatch = 20;
-    zBatches = floor(numZ/zStepsPerBatch);
-    
-    % Find how many time sequences exist in the specified time range
-    timesRange = times;
-    timesRange(timesRange > tRange(2)) = [];
-    timesRange(timesRange < tRange(1)) = [];
-    numT = length(timesRange);
-    tNF = length(times);
-    
-    X = zeros(n(1)*n(2)*zStepsPerBatch,9);
-    inputSlice = zeros(n(1), n(2), 5);
-    for t = latestTime : numT
-        for zB = 1 : zBatches
-            for zStep = 1 : zStepsPerBatch
-                % calculate which entry in image datastore to import
-                tempTime = find(times == timesRange(t));
-                tempZ = (zB-1)*zStepsPerBatch+zStep;
-                if zB == 1 && (zStep == 1 || zStep == 2)
-                    importData = (tempZ-1)*tNF+tempTime;
-                    for zz = 0 : 4
-                        importSlice = importData+zz*tNF;
-                        inputSlice(:,:,zz+1) = readimage(ds, importSlice);
-                    end
-                else
-                    if zB == zBatches && (zStep == zStepsPerBatch - 1 || zStep == zStepsPerBatch)
-                        importData = (tempZ-4)*tNF+tempTime;
-                        for zz = 0 : 4
-                            importSlice = importData+zz*tNF;
-                            inputSlice(:,:,zz+1) = readimage(ds, importSlice);
-                        end
-                    else
-                        importData = (tempZ-2)*tNF+tempTime;
-                        for zz = 0 : 4
-                            importSlice = importData+zz*tNF;
-                            inputSlice(:,:,zz+1) = readimage(ds, importSlice);
-                        end
-                    end
-                end
-                % Condition inputSlice variable
-                inputSlice = cropEdges(inputSlice,cropSize);
-                inputSlice = addEdges(inputSlice,cropSize);
-                xInterval = [(zStep-1)*n(1)*n(2)+1 zStep*n(1)*n(2)];
-                X(xInterval(1):xInterval(2),:) = getInputMatrixV5zs(inputSlice);
-            end
-            y = glmval(b,X,'logit');
-            D_C = classify(y, pCutoff, minCluster, n(1),n(2),zStepsPerBatch);
-            tempPoints = findCentroids(D_C);
-            tempPoints(:,3) = (zB-1).*zStepsPerBatch+tempPoints(:,3);
-            % Use an Agglomerative hierarchical cluster tree to consolidate
-            % duplicate points
-            if size(tempPoints,1)>1
-                [Clusters] = hierarchicalClustering(tempPoints, threshold);
-                clusterPoints = findClusterCentroids(Clusters, tempPoints);
-                pointz = [pointz; clusterPoints];
-            else
-                pointz = [pointz; tempPoints];
-            end
-        end
-        points{t} = pointz;
-        points2{t} = points{t}*[360/n(1) 0 0;0 360/n(2) 0;0 0 z_separation];
-        save(trackData, '-regexp', '^(?!(X)$).') % Save temporary workspace
-    end
-    pointsNEW = formatPoints(points2);
-    [tracks, adjacency_tracks] = simpletracker(pointsNEW, ...
-       'MaxLinkingDistance', max_linking_distance, ...
-       'MaxGapClosing', max_gap_closing);
-    %[tracks, adjacency_tracks] = simpletracker(pointsNEW);
-    
-    % Calculate average swimming speeds
-    %[velTracks, Speed, A] = calcVelocities(pointsNEW, adjacency_tracks, times);
-    
-    % Save final Track Results
-    trackResultsDir = fullfile(masterDir,'Tracking Results');
-    mkdir(trackResultsDir);
-    trackResultsFile = fullfile(trackResultsDir,'tracks');
-    trackResultsFileMAT = strcat(trackResultsFile,'.mat');
-    trackResultsFileXLS = strcat(trackResultsFile, '.xlsx');
-    save(trackResultsFileMAT, '-regexp', '^(?!(X)$).')
-    saveTracksXLSX(pointsNEW, adjacency_tracks, times, trackResultsFileXLS)
-    
-    % Delete temporary track file
-    delete(trackData)
-    
-    % Plot results
-    createPlot(pointsNEW, adjacency_tracks, times)
+    tracking(coordinates)
 end
