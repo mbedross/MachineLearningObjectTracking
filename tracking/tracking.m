@@ -1,8 +1,36 @@
-function tracking(particleCoordinates)
+function tracking(particleCoordinates, MaxLinkingDistance, maxGap)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Author: Manuel Bedrossian, Caltech
+% Date Created: 2018.11.13
+%
+% This function takes in as an input the spatial coordinates of particles
+% in (x,y,z,t) where xyz are in microns and t is in seconds. With this variable,
+% the algorithm creates tracks by using the simple 'Hungarian nearest nieghbor'
+% approach. It is also capable of dealing with jumps and gaps specified by the
+% variable 'maxGap'. The variable 'MaxLinkingDistance' specifies how far each
+% point can be that becomes linked.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+global batchSize
+global minTrackSize
+global particleSize
+global type
+global masterDir
+global n 
+global zSorted
+gloabl zNF
+global tNF
+global zDepth
+global zRange
+global tRange
+global clusterThreshold
 
 [tracks, adjacency_tracks] = simpletracker(particleCoordinates, ...
-	'MaxLinkingDistance', max_linking_distance, ...
-	'MaxGapClosing', max_gap_closing);
+	'MaxLinkingDistance', MaxLinkingDistance, ...
+	'MaxGapClosing', maxGap);
 %[tracks, adjacency_tracks] = simpletracker(pointsNEW);
     
 % Calculate average swimming speeds

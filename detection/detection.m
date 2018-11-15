@@ -23,6 +23,8 @@ global zDepth
 global ds
 global zRange
 global tRange
+global clusterThreshold
+global times
 
 if nargin == 1
 	imageSize = varargin{1}
@@ -106,7 +108,7 @@ for it = latestTime : nT
 			end
 		end
 	end
-	[Clusters] = hierarchicalClustering(points{it}, particleSize);
+	[Clusters] = hierarchicalClustering(points{it}, clusterThreshold);
 	clusterPoints = findClusterCentroids(Clusters, points{it});
 	temporaryPoints = zeros(size(clusterPoints,1), 4);
 	temporaryPoints(:,1:3) = clusterPoints;
