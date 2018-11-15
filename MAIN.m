@@ -70,27 +70,27 @@ global type
 global masterDir
 global n 
 global zSorted
-gloabl zNF
-global tNF
 global zDepth
 global zRange
 global tRange
 global clusterThreshold
 global times
+global tNF
 
 % These next few lines will be replaced by a GUI soon!
 zRange = [-30, -14];  % This is the zRange you would like to track
 zSeparation = 2.5; % This is the physical separation between z-slices (in microns)
 tRange = [1, 335];  % This is the time range you would like to track
 %trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
-trainZrange = [-25, -24];
-trainTrange = [1, 10];
+trainZrange = [1, 14];
+trainTrange = [1, 3];
 particleSize = 30; % Approximate size of the particle in pixels (MUST BE INTEGER)
 pixelPitchX = 350/2048; % Size of each pixel in the image x direction (in microns)
 pixelPitchY = pixelPitchX; % Size of each pixel in the image y direction (in microns)
+pixelPitch = mean([pixelPitchX pixelPitchY]);
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
-zDepth = 2*ceil((2*particleSize*pixelPitch)/z_separation)+1; % number of z-slices to use while tracking
+zDepth = 2*ceil((4*particleSize*pixelPitch)/zSeparation)+1; % number of z-slices to use while tracking
 clusterThreshold = 3*particleSize;
 
 
@@ -121,7 +121,7 @@ addpath('.\preProcessing');
 
 % Define global variables
 
-zSorted = zSteps(fullfile(masterDir, 'Stack', char(type(1))));
+zSorted = zSteps(fullfile(masterDir, 'MeanStack', char(type(1))));
 n = getImageSize(trainTrange(1));
 
 if strcmp(char(type(1)), 'DIC')
@@ -149,13 +149,14 @@ if train == 1
     if preProcess == 0
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
+    tNF = length(times);
     [model, imageSize] = training(trainZrange, trainTrange);
 end
 if track == 1
     if train == 1
-        [coordinates] = detection(model, train, imageSize)
+        [coordinates] = detection(model, train, imageSize);
     else
-        [coordinates] = detection(model, train)
+        [coordinates] = detection(model, train);
     end
     % Convert the units of the output of detection.m into spatial and temporal units
     % Import timestamp file to convert to seconds
@@ -166,6 +167,6 @@ if track == 1
     for i = 1 : length(coordinates)
         coordinates(i,4) = etimes(coordinates(i,4));
     end
-    coordinates(:,1:3) = coordinates(:,1:3)*[pixelPitchX, 0, 0; 0, pixelPitchY; 0, 0, zSeparation]
+    coordinates(:,1:3) = coordinates(:,1:3)*[pixelPitchX, 0, 0; 0, pixelPitchY; 0, 0, zSeparation];
     tracking(coordinates, maxLinkDistance, maxGap)
 end

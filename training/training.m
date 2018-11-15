@@ -12,7 +12,7 @@ function [SVMmodel, sizeSubImage] = training(trainZrange, trainTrange)
 % 1. The user is presented with a windows dialog box and asked to specify
 %    a file location where they would like to save the training data.
 % 2. The code checks the data directory to see if any particle coordinates
-%    exist there. 
+%    exist there.
 % 3. If particle coordinates exist for the data set that is
 %    to be trained, they are loaded to RAM.
 % 4. If particle coordinates do not exist, the code then beings the
@@ -25,8 +25,8 @@ function [SVMmodel, sizeSubImage] = training(trainZrange, trainTrange)
 %    can then use to detect similiar particles in unanalyzed data
 % 7. The model data is then returned back to the calling function as a
 %    list of coefficients and the input matrix used to generate those co-
-%    efficients. 
-% 
+%    efficients.
+%
 % For a detailed list and description of variables please see the read me
 % file 'README.md'
 %
@@ -35,9 +35,7 @@ function [SVMmodel, sizeSubImage] = training(trainZrange, trainTrange)
 global masterDir
 global ds
 global zSorted
-gloabl zNF
 global zDepth
-global n
 global particleSize
 
 % Desired size of sub-image
@@ -46,8 +44,8 @@ sizeImageXY = 4*particleSize;
 % Create a datastore of images
 [ds] = createImgDataStore();
 
-% Define the range of Z slices to train on as global indices of zSorted 
-trainZrange_index = [find(zSorted == trainZrange(1)) find(zSorted == trainZrange(2))]
+% Define the range of Z slices to train on as global indices of zSorted
+trainZrange_index = [find(zSorted == trainZrange(1)) find(zSorted == trainZrange(2))];
 
 [trainFileName, trainPath] = uiputfile('*.mat','Choose Where to Save Training Data file');
 filename = fullfile(trainPath, trainFileName);
@@ -61,9 +59,9 @@ else
     numParticle = 0;
     while trainLock
         tempCoords = getParticleCoordsXY(trainZrange_index, trainTrange, 1);
-        tempCoords = getParticleCoordsZ(tempCoords, 1)
+        tempCoords = getParticleCoordsZ(tempCoords);
         numParticle = numParticle + 1;
-        particleCoords{numParticle, :} = [tempCoords];
+        particleCoords{numParticle, :} = tempCoords;
         track = questdlg('Would you like to track another particle?', 'Yes','No','Yes');
         if strcmp(track, 'No')
             trainLock = 0;
@@ -72,7 +70,7 @@ else
     % Ask user to select coordinates with NO particles in the FOV
     trainTrange_empty = [trainTrange(1), numParticle*(trainTrange(2)-trainTrange(1)+1)];
     tempCoords = getParticleCoordsXY(trainZrange_index, trainTrange_empty, 0);
-    emptyCoords = [tempCoords];
+    emptyCoords = tempCoords;
     save(coordName, 'bugCoords', 'emptyCoords')
 end
 
@@ -89,7 +87,7 @@ X_zRanges = zeros(numTimePoints, zDepth);
 X_indices = zeros(numTimePoints, zDepth);
 for i = 1 : length(particleCoords)
     tempCoords = particleCoords{i,:};
-    numTimePoints = size(tempCoords,1)
+    numTimePoints = size(tempCoords,1);
     for j = 1 : numTimePoints
         zSlice = tempCoords(j,3);
         tPoint = tempCoords(j,4);
@@ -99,10 +97,10 @@ for i = 1 : length(particleCoords)
             I = readimage(ds, X_indices(j,k+1));
             xRange = [tempCoords(j,1)-floor(sizeImageXY/2), tempCoords(j,1)-floor(sizeImageXY/2)+sizeImageXY];
             yRange = [tempCoords(j,2)-floor(sizeImageXY/2), tempCoords(j,2)-floor(sizeImageXY/2)+sizeImageXY];
-            Img(:,:,k+1) = I(xRange(1):xRange(2), yRange(1):yRange(2))
+            Img(:,:,k+1) = I(xRange(1):xRange(2), yRange(1):yRange(2));
         end
-    X(((i-1)*numTimePoints)+j,:) = generatePredictorMatrix(Img, sizeX);
-    Y(((i-1)*numTimePoints)+j) = 1;
+        X(((i-1)*numTimePoints)+j,:) = generatePredictorMatrix(Img, sizeX);
+        Y(((i-1)*numTimePoints)+j) = 1;
     end
 end
 
@@ -119,7 +117,7 @@ for ii = 1 : legnth(emptyCoords)
         I = readimage(ds, X_indices(lastIndexX+ii,k+1));
         xRange = [emptyCoords(ii,1)-floor(sizeImageXY/2), emptyCoords(j,1)-floor(sizeImageXY/2)+sizeImageXY];
         yRange = [emptyCoords(j,2)-floor(sizeImageXY/2), emptyCoords(j,2)-floor(sizeImageXY/2)+sizeImageXY];
-        Img(:,:,k+1) = I(xRange(1):xRange(2), yRange(1):yRange(2))
+        Img(:,:,k+1) = I(xRange(1):xRange(2), yRange(1):yRange(2));
     end
     X(lastIndexX+ii,:) = generatePredictorMatrix(Img, sizeX);
 end

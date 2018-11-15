@@ -21,6 +21,7 @@ function [index] = getDSindex(zDesired, tDesired)
 global tNF
 global zNF
 
+zDesired = zDesired-1;
 totalIndex = zNF*tNF;
 index = zDesired*tNF + tDesired;
 

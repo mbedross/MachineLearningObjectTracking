@@ -1,4 +1,4 @@
-function [particleCoords] = getParticleCoordsXY(trainZrange_index, particleORempty)
+function [particleCoords] = getParticleCoordsXY(trainZrange_index, trainTrange, particleORempty)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -35,36 +35,40 @@ function [particleCoords] = getParticleCoordsXY(trainZrange_index, particleORemp
 
 global masterDir
 global ds
-global zNF
-gloabl tNF
-global zSorted
+global tNF
+global n
 
 % First import mean subtracted and filtered reconstructions into an iamge
 addpath('./supportingAlgorithms');
 load(fullfile(masterDir, 'MeanStack','metaData.mat'));
 
 zCenter = floor((trainZrange_index(1)+trainZrange_index(2))/2);
-
-dsIndex = zCenter*tnF + trainTrange(1) - 1;
-particleCoords = zeros(10, 4);
+dsIndex = getDSindex(zCenter, trainTrange(1))-1; % -1 because the for loop is not 0 indexed
+particleCoords = zeros(trainTrange(2)-trainTrange(1)+1, 4);
 for i = 1 : trainTrange(2)-trainTrange(1)+1
-    h1 = figure(1)
+    h1 = figure(1);
     img = readimage(ds, dsIndex + i);
     imagesc(img)
     axis equal
     colormap gray
     if particleORempty ==1
-        if i = 1
-            title(sprintf('Please select a single particle you wish to track. %f z-plane is shown. Press ENTER when youve selected the single particle', zCenter))
+        if i == 1
+            axis([0 n(1) 0 n(2)])
+            title(sprintf('Please select a single particle you wish to track. %0.2f z-plane is shown at frame %d of %d. Press ENTER when youve selected the single particle', zSorted(zCenter), trainTrange(1)+i-1, tNF))
+            uiwait(msgbox('Find a particle you would like to track and zoom in on it as needed. Press OK when ready to proceed'));
+            ax = gca;
+            xAxis = ax.XLim;
+            yAxis = ax.YLim;
         else
-            title(sprintf('Please select the same particle you wish to track. %f z-plane is shown. Press ENTER when youve selected the single particle', zCenter))
+            title(sprintf('Please select the same particle you wish to track. %0.2f z-plane is shown at frame %d of %d. Press ENTER when youve selected the single particle', zSorted(zCenter), trainTrange(1)+i-1, tNF))
+            axis([xAxis(1) xAxis(2) yAxis(1) yAxis(2)])
         end
     else
-        title(sprintf('Please select a region with NO particle in it. %f z-plane is shown. Press ENTER when youve selected the region', zCenter))
+        title(sprintf('Please select a region with NO particle in it. %0.2f z-plane is shown at frame %d of %d. Press ENTER when youve selected the region', zSorted(zCenter), trainTrange(1)+i-1, tNF))
     end
     [X,Y] = getpts;
     x = floor(mean(X));
     y = floor(mean(Y));
-    particleCoords(i,:) = [x, y, zCenter, trainTrange(1)+i];
+    particleCoords(i,:) = [x, y, zCenter, trainTrange(1)+i-1]; % -1 because i is not 0 indexed
 end
 close(h1)
