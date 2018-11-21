@@ -14,12 +14,8 @@ function [sizeX] = sizePredictorMatrix(N,M,z)
 
 [d] = [N, M, z];
 
-% Calculate image differences in the z direction
-dz = diff(inputPredictor, 1, 3);
-dz_serialized = reshape(dz, [1, numel(dz)]);
-
 % Preallocate memory for predictor matrix
-lengthdz = numel(dz);
+lengthdz = N*M*(z-1);
 lengthGmag = d(1)*d(2)*d(3);
 lengthGdir = lengthGmag;
 lengthSNR = lengthGmag;

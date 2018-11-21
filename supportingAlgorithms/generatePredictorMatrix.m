@@ -31,22 +31,28 @@ function [X] = generatePredictorMatrix(inputPredictor, sizeX)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Normalize the input matrix to be 0-1 (255 because they are 8-bit images)
+inputPredictor = inputPredictor./255;
+
 % Preallocate memory for predictor matrix
+[d] = size(inputPredictor);
 lengthdz   = sizeX(1);
 lengthGmag = sizeX(2);
 lengthGdir = sizeX(3);
 lengthSNR  = sizeX(4);
-lengthFFT  = sizeX(5)
-lengthX    = sum(sizeX);
+lengthFFT  = sizeX(5);
 Gmag_serialized = zeros(1, lengthGmag);
 Gdir_serialized = zeros(1, lengthGdir);
 SNR_serialized  = zeros(1, lengthSNR);
 FFT_serialized  = zeros(1, lengthFFT);
 Gmag_index = 0;
-Gidr_index = 0;
+Gdir_index = 0;
 SNR_index  = 0;
 FFT_index  = 0;
-X = zeros(1, lengthX);
+
+% Calculate image differences in the z direction
+dz = diff(inputPredictor, 1, 3);
+dz_serialized = reshape(dz, [1, lengthdz]);
 
 % Loop through the inputPredictor matrix and calculate characteristics to use in X
 for i = 1 : d(3)
@@ -64,19 +70,20 @@ for i = 1 : d(3)
 	magnitude = abs(FFT);
 	realFFT = real(FFT);
 	imagFFT = imag(FFT);
+    fft = [magnitude realFFT imagFFT];
 	
 	% Update serialized variables
-	Gmag_serialized(Gmag_index + 1, Gmag_index + numel(Gmag)) = reshape(Gmag, [1, numel(Gmag)]);
-	Gdir_serialized(Gdir_index + 1, Gdir_index + numel(Gdir)) = reshape(Gdir, [1, numel(Gdirr)]);
-	SNR_serialized(SNR_index + 1, SNR_index + numel(SNR)) = reshape(SNR, [1, numel(SNR)]);
-	FFT_serialized(FFT_index + 1, FFT_index + numel(FFT)) = reshape(FFT, [1, numel(FFT)]);
+	Gmag_serialized(Gmag_index + 1 : Gmag_index + numel(Gmag)) = reshape(Gmag, [1, numel(Gmag)]);
+	Gdir_serialized(Gdir_index + 1 : Gdir_index + numel(Gdir)) = reshape(Gdir, [1, numel(Gdir)]);
+	SNR_serialized(SNR_index + 1 : SNR_index + numel(SNR)) = reshape(SNR, [1, numel(SNR)]);
+	FFT_serialized(FFT_index + 1 : FFT_index + numel(fft)) = reshape(fft, [1, numel(fft)]);
 
 	% Update serialized index variables
 	Gmag_index = Gmag_index + numel(Gmag);
 	Gdir_index = Gdir_index + numel(Gdir);
 	SNR_index = SNR_index + numel(SNR);
-	FFT_index = FFT_index + numel(FFT);
+	FFT_index = FFT_index + numel(fft);
 end
 
 % Compile the predictor matrix X
-X = [Gmag_serialized Gdir_serialized SNR_serialized FFT_serialized];
+X = [dz_serialized Gmag_serialized Gdir_serialized SNR_serialized FFT_serialized];

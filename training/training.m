@@ -39,7 +39,7 @@ global zDepth
 global particleSize
 
 % Desired size of sub-image
-sizeImageXY = 4*particleSize;
+sizeImageXY = 4*particleSize+1;
 
 % Create a datastore of images
 [ds] = createImgDataStore();
@@ -62,7 +62,7 @@ else
         tempCoords = getParticleCoordsZ(tempCoords);
         numParticle = numParticle + 1;
         particleCoords{numParticle, :} = tempCoords;
-        track = questdlg('Would you like to track another particle?', 'Yes','No','Yes');
+        track = questdlg('Would you like to track another particle?', 'Track Another Particle?', 'Yes','No','Yes');
         if strcmp(track, 'No')
             trainLock = 0;
         end
@@ -71,7 +71,7 @@ else
     trainTrange_empty = [trainTrange(1), numParticle*(trainTrange(2)-trainTrange(1)+1)];
     tempCoords = getParticleCoordsXY(trainZrange_index, trainTrange_empty, 0);
     emptyCoords = tempCoords;
-    save(coordName, 'bugCoords', 'emptyCoords')
+    save(coordName, 'particleCoords', 'emptyCoords')
 end
 
 % For each particle at each time point, generate the 3D image to then be formatted as
@@ -81,23 +81,23 @@ tempCoords = particleCoords{1,:};
 numTimePoints = size(tempCoords,1);
 sizeX = sizePredictorMatrix(sizeSubImage(1),sizeSubImage(2),sizeSubImage(3));
 Img = zeros(sizeSubImage(1),sizeSubImage(2),sizeSubImage(3));
-X = zeros(length(particleCoords)*numTimePoints+length(emptyCoords),sizeX);
-Y = zeros(length(particleCoords)*numTimePoints+length(emptyCoords), 1);
-X_zRanges = zeros(numTimePoints, zDepth);
-X_indices = zeros(numTimePoints, zDepth);
+X = zeros(length(particleCoords)*numTimePoints+size(emptyCoords,1),sum(sizeX));
+Y = zeros(length(particleCoords)*numTimePoints+size(emptyCoords,1), 1);
+X_zRanges = zeros(length(particleCoords)*numTimePoints+size(emptyCoords,1), zDepth);
+X_indices = zeros(length(particleCoords)*numTimePoints+size(emptyCoords,1), zDepth);
 for i = 1 : length(particleCoords)
     tempCoords = particleCoords{i,:};
     numTimePoints = size(tempCoords,1);
     for j = 1 : numTimePoints
         zSlice = tempCoords(j,3);
         tPoint = tempCoords(j,4);
+        xRange = [tempCoords(j,1)-floor(sizeImageXY/2), tempCoords(j,1)-floor(sizeImageXY/2)+sizeImageXY-1];
+        yRange = [tempCoords(j,2)-floor(sizeImageXY/2), tempCoords(j,2)-floor(sizeImageXY/2)+sizeImageXY-1];
         for k = 0 : zDepth -1
-            X_zRanges(j,k+1) = zSlice - (zDepth-1)/2 + i;
+            X_zRanges(j,k+1) = zSlice - (zDepth-1)/2 + k;
             X_indices(j,k+1) = getDSindex(X_zRanges(j,k+1), tPoint);
             I = readimage(ds, X_indices(j,k+1));
-            xRange = [tempCoords(j,1)-floor(sizeImageXY/2), tempCoords(j,1)-floor(sizeImageXY/2)+sizeImageXY];
-            yRange = [tempCoords(j,2)-floor(sizeImageXY/2), tempCoords(j,2)-floor(sizeImageXY/2)+sizeImageXY];
-            Img(:,:,k+1) = I(xRange(1):xRange(2), yRange(1):yRange(2));
+            Img(:,:,k+1) = I(yRange(1):yRange(2), xRange(1):xRange(2));
         end
         X(((i-1)*numTimePoints)+j,:) = generatePredictorMatrix(Img, sizeX);
         Y(((i-1)*numTimePoints)+j) = 1;
@@ -108,16 +108,16 @@ lastIndexX = ((i-1)*numTimePoints)+j;
 
 % For each coordinate of empty space, generate the 3D image to then be formatted as
 % a predictor matrix
-for ii = 1 : legnth(emptyCoords)
+for ii = 1 : size(emptyCoords,1)
     zSlice = emptyCoords(ii, 3);
     tPoint = emptyCoords(ii, 4);
+    xRange = [emptyCoords(ii,1)-floor(sizeImageXY/2), emptyCoords(ii,1)-floor(sizeImageXY/2)+sizeImageXY-1];
+    yRange = [emptyCoords(ii,2)-floor(sizeImageXY/2), emptyCoords(ii,2)-floor(sizeImageXY/2)+sizeImageXY-1];
     for k = 0 : zDepth -1
         X_zRanges(lastIndexX+ii,k+1) = zSlice - (zDepth-1)/2 + i;
         X_indices(lastIndexX+ii,k+1) = getDSindex(X_zRanges(lastIndexX+ii,k+1), tPoint);
         I = readimage(ds, X_indices(lastIndexX+ii,k+1));
-        xRange = [emptyCoords(ii,1)-floor(sizeImageXY/2), emptyCoords(j,1)-floor(sizeImageXY/2)+sizeImageXY];
-        yRange = [emptyCoords(j,2)-floor(sizeImageXY/2), emptyCoords(j,2)-floor(sizeImageXY/2)+sizeImageXY];
-        Img(:,:,k+1) = I(xRange(1):xRange(2), yRange(1):yRange(2));
+        Img(:,:,k+1) = I(yRange(1):yRange(2), xRange(1):xRange(2));
     end
     X(lastIndexX+ii,:) = generatePredictorMatrix(Img, sizeX);
 end

@@ -78,7 +78,7 @@ global times
 global tNF
 
 % These next few lines will be replaced by a GUI soon!
-zRange = [-30, -14];  % This is the zRange you would like to track
+zRange = [1, 14];  % This is the zRange you would like to track
 zSeparation = 2.5; % This is the physical separation between z-slices (in microns)
 tRange = [1, 335];  % This is the time range you would like to track
 %trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
