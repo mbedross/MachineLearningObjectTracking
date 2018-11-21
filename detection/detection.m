@@ -72,7 +72,7 @@ for it = latestTime : nT
         zPlane = find(zSorted == zSorted_range(iz));
         for ix = 1 : nX
             for iy = 1 : nY
-                center = [Ax(ix,iy), Ay(ix,iy)];
+                center = [Ax(iy,ix), Ay(iy,ix)];
                 xRange_subImage = [center(1)-(imageSize(1)-1)/2, center(1)-(imageSize(1)-1)/2+imageSize(1)-1];
                 yRange_subImage = [center(2)-(imageSize(2)-1)/2, center(2)-(imageSize(2)-1)/2+imageSize(2)-1];
                 for k = 0 : zDepth -1
@@ -83,12 +83,12 @@ for it = latestTime : nT
                 end
                 X = generatePredictorMatrix(Img, sizeX);
                 [label, PostProbs] = predict(model, X);
-                A(ix, iy, iz) = label;
+                A(iy, ix, iz) = label;
                 if label == 1
-                    probability(ix,iy,iz) = PostProbs(2);
-                    points_raw{it} = [points_raw{it}; Ax(ix,iy), Ay(ix,iy), zSorted_range(iz)];
+                    probability(iy,ix,iz) = PostProbs(2);
+                    points_raw{it} = [points_raw{it}; Ax(iy,ix), Ay(iy,ix), zSorted_range(iz)];
                 else
-                    probability(ix,iy,iz) = PostProbs(1);
+                    probability(iy,ix,iz) = PostProbs(1);
                 end
             end
         end
