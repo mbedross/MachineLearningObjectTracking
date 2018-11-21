@@ -1,24 +1,19 @@
-function [points_clustered] = detection(model, train, varargin)
+function [points_clustered] = detection(model, imageSize, voxelPitch)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Author: Manuel Bedrossian, Caltech
 % Date Created: 2018.11.13
 %
-% This function takes as an input the parameters for the Support Vector 
+% This function takes as an input the parameters for the Support Vector
 % Machine (SVM) generated for the data that is to be analyzed
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-global batchSize
-global minTrackSize
 global particleSize
-global type
 global masterDir
-global n 
+global n
 global zSorted
-gloabl zNF
-global tNF
 global zDepth
 global ds
 global zRange
@@ -26,45 +21,33 @@ global tRange
 global clusterThreshold
 global times
 
-if nargin == 1
-	imageSize = varargin{1}
-end
-
 % Create a datastore of images
 [ds] = createImgDataStore();
-
-% If the dataset is already trained, load the model variables
-if train == 0
-	[trainFileName, trainPath] = uigetfile('*.mat','Choose Training Data file');
-	trainDir = fullfile(trainPath, trainFileName);
-	load(trainDir);
-	load(fullfile(masterDir, 'MeanStack','metaData.mat'))
-end
 
 % If tracking data already exists, load it
 % This is a temporary file that saves after each iteration in order to
 % prevent data loss as a result of an error or power failure
 trackData = fullfile(masterDir,'tempTrackData.mat');
 if exist(trackData, 'file') == 2
-	load(trackData)
-	latestTime = it;
-	clear t
+    load(trackData)
+    latestTime = it;
+    clear t
 else
-	latestTime = 1;
+    latestTime = 1;
 end
 
 zSorted_range = zSorted;
 zSorted_range(zSorted > zRange(2)) = [];
-zSorted_range(zSorted < zRange(1)) = [];   
+zSorted_range(zSorted < zRange(1)) = [];
 timePoints_range = times;
 timePoints_range(timePoints_range > tRange(2)) = [];
 timePoints_range(timePoints_range < tRange(1)) = [];
 sizeX = sizePredictorMatrix(imageSize(1),imageSize(2),imageSize(3));
-xMargin = imageSize(1)/2;
-yMargin = imageSize(2)/2;
+xMargin = (imageSize(1)-1)/2;
+yMargin = (imageSize(2)-1)/2;
 zMargin = (imageSize(3)-1)/2;
-zSorted_range(1:zMargin) = [];
-zSorted_range(end-zMargin:end) = [];
+zSorted_range(1:zMargin+1) = [];
+zSorted_range(end-zMargin+1:end) = [];
 xRange = n(1)-2*xMargin;
 yRange = n(2)-2*yMargin;
 interval = floor(particleSize/2);
@@ -79,41 +62,44 @@ A = false(nX, nY, nZ);
 probability = zeros(nX,nY,nZ);
 % Ax and Ay are transfer functions to translate the location of a label in A to xy pixel locations
 % e.g. the label of A(x,y,z) corresponds to the pixel location of [Ax(x,y), Ay(x,y), zSorted_range(z)]
-[Ax, Ay] = meshgrid(xMargin+(0:nX-1)*interval, yMargin+(0:nY-1)*interval);
+[Ax, Ay] = meshgrid(xMargin+(0:nX-1)*interval+1, yMargin+(0:nY-1)*interval+1);
 points_raw = cell(nT, 1);
+points_spatial = cell(nT, 1);
+Img = zeros(imageSize(1),imageSize(2),imageSize(3));
 for it = latestTime : nT
-	tPoint = timePoints_range(it);
-	for iz = 1 : nZ
-		zPlane = zSlice - (zDepth-1)/2 + iz;
-		index = getDSindex(zPlane,tPoint)
-		I = readimage(ds, index);
-		for ix = 1 : nX
-			for iy 1 : nY
-				center = [Ax(ix,iy), Ay(ix,iy)];
-				for k = 0 : zDepth -1
-					xRange_subImage = [center(1)-floor(imageSize(1)/2), center(1)-floor(imageSize(1)/2)+sizeImageXY];
-					yRange_subImage = [center(2)-floor(imageSize(2)/2), center(2)-floor(imageSize(2)/2)+sizeImageXY];
-					Img = I(xRange_subImage(1):xRange_subImage(2), yRange_subImage(1):yRange_subImage(2));
-				end
-				X = generatePredictorMatrix(Img, sizeX);
-				[label, PostProbs] = predict(model, X);
-				A(ix, iy, iz) = label;
-
-				if label == 1
-					probability(ix,iy,iz) = PostProbs;
-					points_raw{it} = [points_raw{it}; Ax(ix,iy), Ay(ix,iy), zSorted_range(iz)];
-				else
-					probability(ix,iy,iz) = 1 - PostProbs;
-				end
-			end
-		end
-	end
-	[Clusters] = hierarchicalClustering(points{it}, clusterThreshold);
-	clusterPoints = findClusterCentroids(Clusters, points{it});
-	temporaryPoints = zeros(size(clusterPoints,1), 4);
-	temporaryPoints(:,1:3) = clusterPoints;
-	temporaryPoints(:,4) = tPoint;
-	points_clustered = [points_clustered; temporaryPoints];
-	clear temporaryPoints
-	save(trackData, '-regexp', '^(?!(X)$).') % Save temporary workspace
+    tPoint = timePoints_range(it);
+    for iz = 1 : nZ
+        zPlane = find(zSorted == zSorted_range(iz));
+        for ix = 1 : nX
+            for iy = 1 : nY
+                center = [Ax(ix,iy), Ay(ix,iy)];
+                xRange_subImage = [center(1)-(imageSize(1)-1)/2, center(1)-(imageSize(1)-1)/2+imageSize(1)-1];
+                yRange_subImage = [center(2)-(imageSize(2)-1)/2, center(2)-(imageSize(2)-1)/2+imageSize(2)-1];
+                for k = 0 : zDepth -1
+                    tempZ = zPlane - (zDepth-1)/2 + k;
+                    index = getDSindex(tempZ,tPoint);
+                    I = readimage(ds, index);
+                    Img(:,:,k+1) = I(yRange_subImage(1):yRange_subImage(2), xRange_subImage(1):xRange_subImage(2));
+                end
+                X = generatePredictorMatrix(Img, sizeX);
+                [label, PostProbs] = predict(model, X);
+                A(ix, iy, iz) = label;
+                if label == 1
+                    probability(ix,iy,iz) = PostProbs(2);
+                    points_raw{it} = [points_raw{it}; Ax(ix,iy), Ay(ix,iy), zSorted_range(iz)];
+                else
+                    probability(ix,iy,iz) = PostProbs(1);
+                end
+            end
+        end
+    end
+    points_spatial{it} = points_raw{it}*[voxelPitch(1), 0, 0; 0, voxelPitch(2); 0, 0, voxelPitch(3)];
+    [Clusters] = hierarchicalClustering(points_spatial{it}, clusterThreshold);
+    clusterPoints = findClusterCentroids(Clusters, points_raw{it});
+    temporaryPoints = zeros(size(clusterPoints,1), 4);
+    temporaryPoints(:,1:3) = clusterPoints;
+    temporaryPoints(:,4) = tPoint;
+    points_clustered = [points_clustered; temporaryPoints];
+    clear temporaryPoints
+    save(trackData, '-regexp', '^(?!(X)$).') % Save temporary workspace
 end

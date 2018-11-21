@@ -76,6 +76,7 @@ global tRange
 global clusterThreshold
 global times
 global tNF
+global zNF
 
 % These next few lines will be replaced by a GUI soon!
 zRange = [1, 14];  % This is the zRange you would like to track
@@ -88,6 +89,7 @@ particleSize = 30; % Approximate size of the particle in pixels (MUST BE INTEGER
 pixelPitchX = 350/2048; % Size of each pixel in the image x direction (in microns)
 pixelPitchY = pixelPitchX; % Size of each pixel in the image y direction (in microns)
 pixelPitch = mean([pixelPitchX pixelPitchY]);
+voxelPitch = [pixelPitchX pixelPitchY zSeparation];
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
 zDepth = 2*ceil((4*particleSize*pixelPitch)/zSeparation)+1; % number of z-slices to use while tracking
@@ -150,13 +152,21 @@ if train == 1
         load(fullfile(masterDir, 'MeanStack','metaData.mat'));
     end
     tNF = length(times);
-    [model, imageSize] = training(trainZrange, trainTrange);
+    [SVMmodel, imageSize] = training(trainZrange, trainTrange);
 end
 if track == 1
+    addpath('.\detection');
+    addpath('.\tracking');
     if train == 1
-        [coordinates] = detection(model, train, imageSize);
+        [coordinates] = detection(SVMmodel, imageSize, voxelPitch);
     else
-        [coordinates] = detection(model, train);
+        [trainFileName, trainPath] = uigetfile('*.mat','Choose Training Data file');
+        trainDir = fullfile(trainPath, trainFileName);
+        load(trainDir);
+        load(fullfile(masterDir, 'MeanStack','metaData.mat'))
+        tNF = length(times);
+        zNF = length(zSorted);
+        [coordinates] = detection(SVMmodel, sizeSubImage, voxelPitch);
     end
     % Convert the units of the output of detection.m into spatial and temporal units
     % Import timestamp file to convert to seconds
@@ -167,6 +177,5 @@ if track == 1
     for i = 1 : length(coordinates)
         coordinates(i,4) = etimes(coordinates(i,4));
     end
-    coordinates(:,1:3) = coordinates(:,1:3)*[pixelPitchX, 0, 0; 0, pixelPitchY; 0, 0, zSeparation];
     tracking(coordinates, maxLinkDistance, maxGap)
 end

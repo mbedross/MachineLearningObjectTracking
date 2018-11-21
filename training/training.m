@@ -39,6 +39,7 @@ global zDepth
 global particleSize
 
 % Desired size of sub-image
+% This will always be an odd number
 sizeImageXY = 4*particleSize+1;
 
 % Create a datastore of images
@@ -114,7 +115,7 @@ for ii = 1 : size(emptyCoords,1)
     xRange = [emptyCoords(ii,1)-floor(sizeImageXY/2), emptyCoords(ii,1)-floor(sizeImageXY/2)+sizeImageXY-1];
     yRange = [emptyCoords(ii,2)-floor(sizeImageXY/2), emptyCoords(ii,2)-floor(sizeImageXY/2)+sizeImageXY-1];
     for k = 0 : zDepth -1
-        X_zRanges(lastIndexX+ii,k+1) = zSlice - (zDepth-1)/2 + i;
+        X_zRanges(lastIndexX+ii,k+1) = zSlice - (zDepth-1)/2 + k;
         X_indices(lastIndexX+ii,k+1) = getDSindex(X_zRanges(lastIndexX+ii,k+1), tPoint);
         I = readimage(ds, X_indices(lastIndexX+ii,k+1));
         Img(:,:,k+1) = I(yRange(1):yRange(2), xRange(1):xRange(2));
