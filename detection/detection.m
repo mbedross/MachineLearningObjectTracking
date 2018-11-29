@@ -10,7 +10,6 @@ function [points_clustered] = detection(model, imageSize, voxelPitch)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-global particleSize
 global masterDir
 global n
 global zSorted
@@ -50,7 +49,7 @@ zSorted_range(1:zMargin+1) = [];
 zSorted_range(end-zMargin+1:end) = [];
 xRange = n(1)-2*xMargin;
 yRange = n(2)-2*yMargin;
-interval = floor(particleSize/2);
+interval = xMargin;
 nX = floor(xRange/interval);
 nY = floor(yRange/interval);
 nZ = length(zSorted_range);
@@ -71,6 +70,7 @@ for it = latestTime : nT
     for iz = 1 : nZ
         zPlane = find(zSorted == zSorted_range(iz));
         for ix = 1 : nX
+            tic
             for iy = 1 : nY
                 center = [Ax(iy,ix), Ay(iy,ix)];
                 xRange_subImage = [center(1)-(imageSize(1)-1)/2, center(1)-(imageSize(1)-1)/2+imageSize(1)-1];
@@ -91,6 +91,7 @@ for it = latestTime : nT
                     probability(iy,ix,iz) = PostProbs(1);
                 end
             end
+            toc
         end
     end
     points_spatial{it} = points_raw{it}*[voxelPitch(1), 0, 0; 0, voxelPitch(2); 0, 0, voxelPitch(3)];

@@ -40,7 +40,7 @@ global particleSize
 
 % Desired size of sub-image
 % This will always be an odd number
-sizeImageXY = 4*particleSize+1;
+sizeImageXY = 2*particleSize+1;
 
 % Create a datastore of images
 [ds] = createImgDataStore();
