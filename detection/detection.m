@@ -64,11 +64,17 @@ probability = zeros(nX,nY,nZ);
 [Ax, Ay] = meshgrid(xMargin+(0:nX-1)*interval+1, yMargin+(0:nY-1)*interval+1);
 points_raw = cell(nT, 1);
 points_spatial = cell(nT, 1);
+I = uint8(zeros(n(1),n(2),zDepth));
 Img = zeros(imageSize(1),imageSize(2),imageSize(3));
 for it = latestTime : nT
     tPoint = timePoints_range(it);
     for iz = 1 : nZ
         zPlane = find(zSorted == zSorted_range(iz));
+        for k = 0 : zDepth -1
+            tempZ = zPlane - (zDepth-1)/2 + k;
+            index = getDSindex(tempZ,tPoint);
+            I(:,:,k+1) = readimage(ds, index);
+        end
         for ix = 1 : nX
             tic
             for iy = 1 : nY
@@ -76,10 +82,7 @@ for it = latestTime : nT
                 xRange_subImage = [center(1)-(imageSize(1)-1)/2, center(1)-(imageSize(1)-1)/2+imageSize(1)-1];
                 yRange_subImage = [center(2)-(imageSize(2)-1)/2, center(2)-(imageSize(2)-1)/2+imageSize(2)-1];
                 for k = 0 : zDepth -1
-                    tempZ = zPlane - (zDepth-1)/2 + k;
-                    index = getDSindex(tempZ,tPoint);
-                    I = readimage(ds, index);
-                    Img(:,:,k+1) = I(yRange_subImage(1):yRange_subImage(2), xRange_subImage(1):xRange_subImage(2));
+                    Img(:,:,k+1) = I(yRange_subImage(1):yRange_subImage(2), xRange_subImage(1):xRange_subImage(2),k+1);
                 end
                 X = generatePredictorMatrix(Img, sizeX);
                 [label, PostProbs] = predict(model, X);
