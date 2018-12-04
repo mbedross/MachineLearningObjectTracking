@@ -20,6 +20,10 @@ global tRange
 global clusterThreshold
 global times
 
+%GPU = questdlg('Would you like to use GPU parallelization for Pre-Processing? NOTE: This is only to be called when the user wants to use GPU parallelization. This depends on the capabilities of the GPU on the machine this is to run on. Check GPU specs before using and/or contact Manuel Bedrossian (mbedross@caltech.edu)', ...
+%    'GPU Parallelization', ...
+%    'Yes','No','No');
+
 % Create a datastore of images
 [ds] = createImgDataStore();
 
@@ -64,8 +68,8 @@ probability = zeros(nX,nY,nZ);
 [Ax, Ay] = meshgrid(xMargin+(0:nX-1)*interval+1, yMargin+(0:nY-1)*interval+1);
 points_raw = cell(nT, 1);
 points_spatial = cell(nT, 1);
-I = uint8(zeros(n(1),n(2),zDepth));
-Img = zeros(imageSize(1),imageSize(2),imageSize(3));
+I = gpuArray(zeros(n(1),n(2),zDepth));
+Img = gpuArray(zeros(imageSize(1),imageSize(2),imageSize(3)));
 for it = latestTime : nT
     tPoint = timePoints_range(it);
     for iz = 1 : nZ
@@ -85,13 +89,14 @@ for it = latestTime : nT
                     Img(:,:,k+1) = I(yRange_subImage(1):yRange_subImage(2), xRange_subImage(1):xRange_subImage(2),k+1);
                 end
                 X = generatePredictorMatrix(Img, sizeX);
-                [label, PostProbs] = predict(model, X);
+                %[label, PostProbs] = predict(model, X);
+                [label] = predict(model, X);
                 A(iy, ix, iz) = label;
                 if label == 1
-                    probability(iy,ix,iz) = PostProbs(2);
+                    %probability(iy,ix,iz) = PostProbs(2);
                     points_raw{it} = [points_raw{it}; Ax(iy,ix), Ay(iy,ix), zSorted_range(iz)];
                 else
-                    probability(iy,ix,iz) = PostProbs(1);
+                    %probability(iy,ix,iz) = PostProbs(1);
                 end
             end
             toc

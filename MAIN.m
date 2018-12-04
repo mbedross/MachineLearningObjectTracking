@@ -92,7 +92,7 @@ pixelPitch = mean([pixelPitchX pixelPitchY]);
 voxelPitch = [pixelPitchX pixelPitchY zSeparation];
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
-zDepth = 3*ceil((particleSize*pixelPitch)/zSeparation)+1; % number of z-slices to use while tracking
+zDepth = 4*ceil((particleSize*pixelPitch)/zSeparation)+1; % number of z-slices to use while tracking
 clusterThreshold = 3*particleSize;
 
 

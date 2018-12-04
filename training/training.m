@@ -81,8 +81,8 @@ sizeSubImage = [sizeImageXY, sizeImageXY, zDepth];
 tempCoords = particleCoords{1,:};
 numTimePoints = size(tempCoords,1);
 sizeX = sizePredictorMatrix(sizeSubImage(1),sizeSubImage(2),sizeSubImage(3));
-Img = zeros(sizeSubImage(1),sizeSubImage(2),sizeSubImage(3));
-X = zeros(length(particleCoords)*numTimePoints+size(emptyCoords,1),sum(sizeX));
+Img = gpuArray(zeros(sizeSubImage(1),sizeSubImage(2),sizeSubImage(3)));
+X = gpuArray(zeros(length(particleCoords)*numTimePoints+size(emptyCoords,1),sum(sizeX)));
 Y = zeros(length(particleCoords)*numTimePoints+size(emptyCoords,1), 1);
 X_zRanges = zeros(length(particleCoords)*numTimePoints+size(emptyCoords,1), zDepth);
 X_indices = zeros(length(particleCoords)*numTimePoints+size(emptyCoords,1), zDepth);
@@ -97,7 +97,7 @@ for i = 1 : length(particleCoords)
         for k = 0 : zDepth -1
             X_zRanges(j,k+1) = zSlice - (zDepth-1)/2 + k;
             X_indices(j,k+1) = getDSindex(X_zRanges(j,k+1), tPoint);
-            I = readimage(ds, X_indices(j,k+1));
+            I = gpuArray(readimage(ds, X_indices(j,k+1)));
             Img(:,:,k+1) = I(yRange(1):yRange(2), xRange(1):xRange(2));
         end
         X(((i-1)*numTimePoints)+j,:) = generatePredictorMatrix(Img, sizeX);
@@ -128,7 +128,7 @@ tic
 [SVMmodel] = fitcsvm(X,Y);
 % Compute the optimal transfer function between fit scores and posterior probabilities of
 % the SVM model using the predictor matrix X and class labels Y
-[SVMmodel] = fitSVMPosterior(SVMmodel, X, Y);
+%[SVMmodel] = fitSVMPosterior(SVMmodel, X, Y);
 toc
 
 % Calculating the optimal score to posterior probability transfer function allows the SVM

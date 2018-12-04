@@ -31,9 +31,6 @@ function [X] = generatePredictorMatrix(inputPredictor, sizeX)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Normalize the input matrix to be 0-1 (255 because they are 8-bit images)
-inputPredictor = inputPredictor./255;
-
 % Preallocate memory for predictor matrix
 [d] = size(inputPredictor);
 lengthdz   = sizeX(1);
@@ -41,10 +38,10 @@ lengthGmag = sizeX(2);
 lengthGdir = sizeX(3);
 lengthSNR  = sizeX(4);
 lengthFFT  = sizeX(5);
-Gmag_serialized = zeros(1, lengthGmag);
-Gdir_serialized = zeros(1, lengthGdir);
-SNR_serialized  = zeros(1, lengthSNR);
-FFT_serialized  = zeros(1, lengthFFT);
+Gmag_serialized = gpuArray(zeros(1, lengthGmag));
+Gdir_serialized = gpuArray(zeros(1, lengthGdir));
+SNR_serialized  = gpuArray(zeros(1, lengthSNR));
+FFT_serialized  = gpuArray(zeros(1, lengthFFT));
 Gmag_index = 0;
 Gdir_index = 0;
 SNR_index  = 0;
