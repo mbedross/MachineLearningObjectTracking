@@ -70,6 +70,7 @@ points_raw = cell(nT, 1);
 points_spatial = cell(nT, 1);
 I = gpuArray(zeros(n(1),n(2),zDepth));
 Img = gpuArray(zeros(imageSize(1),imageSize(2),imageSize(3)));
+X = gpuArray(zeros(nY, sum(sizeX)));
 for it = latestTime : nT
     tPoint = timePoints_range(it);
     for iz = 1 : nZ
@@ -88,17 +89,17 @@ for it = latestTime : nT
                 for k = 0 : zDepth -1
                     Img(:,:,k+1) = I(yRange_subImage(1):yRange_subImage(2), xRange_subImage(1):xRange_subImage(2),k+1);
                 end
-                X = generatePredictorMatrix(Img, sizeX);
-                %[label, PostProbs] = predict(model, X);
-                [label] = predict(model, X);
-                A(iy, ix, iz) = label;
-                if label == 1
-                    %probability(iy,ix,iz) = PostProbs(2);
-                    points_raw{it} = [points_raw{it}; Ax(iy,ix), Ay(iy,ix), zSorted_range(iz)];
-                else
-                    %probability(iy,ix,iz) = PostProbs(1);
-                end
+                X(iy,:) = generatePredictorMatrix(Img, sizeX);
             end
+            %[label, PostProbs] = predict(model, X);
+            [label] = predict(model, X);
+%             A(iy, ix, iz) = label;
+%             if label == 1
+%                 %probability(iy,ix,iz) = PostProbs(2);
+%                 points_raw{it} = [points_raw{it}; Ax(iy,ix), Ay(iy,ix), zSorted_range(iz)];
+%             else
+%                 %probability(iy,ix,iz) = PostProbs(1);
+%             end
             toc
         end
     end

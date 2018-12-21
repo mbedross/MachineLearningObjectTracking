@@ -79,12 +79,12 @@ global tNF
 global zNF
 
 % These next few lines will be replaced by a GUI soon!
-zRange = [1, 14];  % This is the zRange you would like to track
+zRange = [-20, 10];  % This is the zRange you would like to track
 zSeparation = 2.5; % This is the physical separation between z-slices (in microns)
-tRange = [1, 335];  % This is the time range you would like to track
+tRange = [1, 172];  % This is the time range you would like to track
 %trainZrange = [zSorted(floor(length(zSorted)/2)), zSorted(floor(length(zSorted)/2))+1];
-trainZrange = [1, 14];
-trainTrange = [1, 3];
+trainZrange = [-14, 1];
+trainTrange = [1, 10];
 particleSize = 30; % Approximate size of the particle in pixels (MUST BE INTEGER)
 pixelPitchX = 350/2048; % Size of each pixel in the image x direction (in microns)
 pixelPitchY = pixelPitchX; % Size of each pixel in the image y direction (in microns)
@@ -92,7 +92,7 @@ pixelPitch = mean([pixelPitchX pixelPitchY]);
 voxelPitch = [pixelPitchX pixelPitchY zSeparation];
 batchSize = 30; % This is the number of reconstructions that are batched together for mean subtraction
 minTrackSize = 20; % The minumum length of a track in order to be recorded
-zDepth = 4*ceil((particleSize*pixelPitch)/zSeparation)+1; % number of z-slices to use while tracking
+zDepth = 6*ceil((particleSize*pixelPitch)/zSeparation)+1; % number of z-slices to use while tracking
 clusterThreshold = 3*particleSize;
 
 
@@ -132,8 +132,8 @@ end
 
 centerx = n(1)/2;
 centery = n(2)/2;
-innerRadius = 25;
-outerRadius = 310; %310 for common mode
+innerRadius = 10; % 25 for CM 10 for high res
+outerRadius = 210; %310 for common mode % 210 for high res
 
 %% Main section
 % Add the preprocess and training subdolders to MATLAB search path, and run
