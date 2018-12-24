@@ -80,6 +80,28 @@ for it = latestTime : nT
             index = getDSindex(tempZ,tPoint);
             I(:,:,k+1) = readimage(ds, index);
         end
+        centerImageIndex = getDSindex(zPlane, tPoint);
+        centerImage = readimage(ds, centerImageIndex);
+        [props] = boundaryDetection(I);
+        [coordinates] = pointsOfInterest(props)
+        nPoints = size(coordinates,1);
+        X = gpuArray(zeros(nPoints, sum(sizeX)));
+        for ixy = 1 : length(coordinates)
+            center = coordinates(ixy, :);
+            xRange_subImage = [center(1)-(imageSize(1)-1)/2, center(1)-(imageSize(1)-1)/2+imageSize(1)-1];
+            yRange_subImage = [center(2)-(imageSize(2)-1)/2, center(2)-(imageSize(2)-1)/2+imageSize(2)-1];
+            for k = 0 : zDepth -1
+                Img(:,:,k+1) = I(yRange_subImage(1):yRange_subImage(2), xRange_subImage(1):xRange_subImage(2),k+1);
+            end
+            X(ixy,:) = generatePredictorMatrix(Img, sizeX);
+        end
+        [label] = predict(model, X);
+
+
+
+
+
+
         for ix = 1 : nX
             tic
             for iy = 1 : nY

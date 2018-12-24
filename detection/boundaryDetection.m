@@ -2,9 +2,19 @@ function [props] = boundaryDetection(I)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% Author: Manuel Bedrossian, Caltech
+% Date Created: 2018.11.13
+%
+% This function takes in as an image the reconstruction at a single z-plane
+% of holographic data reconstructed in either amplitude, phase, or any other
+% type of reconstruction.
+%
+% With the input image it calculates the STD map of the image with 5 pixel neighborhoods
+% and uses this to look for particles as a very low level filter for the ML code.
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-I_std = stdfilt(I); % This calculates the local standard deviation of the image with 4x4 pixel neighborhoods
+I_std = stdfilt(I, true(5)); % This calculates the local standard deviation of the image with 4x4 pixel neighborhoods
 I_stdMean = mean(I_std(:));
 I_stdSTD = std(I_std(:));
 I_std(I_std<(I_stdMean+3*I_stdSTD)) = 0; % Make all non outliers equal to 0
