@@ -74,6 +74,7 @@ X = gpuArray(zeros(nY, sum(sizeX)));
 for it = latestTime : nT
     tPoint = timePoints_range(it);
     for iz = 1 : nZ
+        tic
         zPlane = find(zSorted == zSorted_range(iz));
         for k = 0 : zDepth -1
             tempZ = zPlane - (zDepth-1)/2 + k;
@@ -82,8 +83,8 @@ for it = latestTime : nT
         end
         centerImageIndex = getDSindex(zPlane, tPoint);
         centerImage = readimage(ds, centerImageIndex);
-        [props] = boundaryDetection(I);
-        [coordinates] = pointsOfInterest(props)
+        [props] = boundaryDetection(centerImage);
+        [coordinates] = pointsOfInterest(props, imageSize);
         nPoints = size(coordinates,1);
         X = gpuArray(zeros(nPoints, sum(sizeX)));
         for ixy = 1 : length(coordinates)
@@ -96,34 +97,16 @@ for it = latestTime : nT
             X(ixy,:) = generatePredictorMatrix(Img, sizeX);
         end
         [label] = predict(model, X);
-
-
-
-
-
-
-        for ix = 1 : nX
-            tic
-            for iy = 1 : nY
-                center = [Ax(iy,ix), Ay(iy,ix)];
-                xRange_subImage = [center(1)-(imageSize(1)-1)/2, center(1)-(imageSize(1)-1)/2+imageSize(1)-1];
-                yRange_subImage = [center(2)-(imageSize(2)-1)/2, center(2)-(imageSize(2)-1)/2+imageSize(2)-1];
-                for k = 0 : zDepth -1
-                    Img(:,:,k+1) = I(yRange_subImage(1):yRange_subImage(2), xRange_subImage(1):xRange_subImage(2),k+1);
-                end
-                X(iy,:) = generatePredictorMatrix(Img, sizeX);
-            end
-            %[label, PostProbs] = predict(model, X);
-            [label] = predict(model, X);
-%             A(iy, ix, iz) = label;
-%             if label == 1
-%                 %probability(iy,ix,iz) = PostProbs(2);
-%                 points_raw{it} = [points_raw{it}; Ax(iy,ix), Ay(iy,ix), zSorted_range(iz)];
-%             else
-%                 %probability(iy,ix,iz) = PostProbs(1);
-%             end
-            toc
-        end
+        label = logical(label);
+        points_raw{it} = coordinates(label, :);
+        %             A(iy, ix, iz) = label;
+        %             if label == 1
+        %                 %probability(iy,ix,iz) = PostProbs(2);
+        %                 points_raw{it} = [points_raw{it}; Ax(iy,ix), Ay(iy,ix), zSorted_range(iz)];
+        %             else
+        %                 %probability(iy,ix,iz) = PostProbs(1);
+        %             end
+    toc
     end
     points_spatial{it} = points_raw{it}*[voxelPitch(1), 0, 0; 0, voxelPitch(2); 0, 0, voxelPitch(3)];
     [Clusters] = hierarchicalClustering(points_spatial{it}, clusterThreshold);
